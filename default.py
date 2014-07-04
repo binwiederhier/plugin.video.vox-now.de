@@ -90,6 +90,17 @@ def showEpisodes(id):
             match = re.compile('(\d*)\:(\d*)\:(\d*)', re.DOTALL).findall(duration)
             if match!=None and len(match[0])>=3:
                 duration = match[0][1]
+                
+            fanart = None
+            if __SETTING_SHOW_FANART__:
+                fanart = episode.get('bigaufmacherimg', '')
+                fanart = fanart.replace('/640x360/', '/768x432/')
+                
+            thumbnailImage = ''
+            img_id = episode.get('pictures', {}).get('pic_0', None)
+            if img_id!=None:
+                thumbnailImage = 'http://autoimg.rtl.de/voxnow/%IMG_ID%/660x660/formatimage.jpg'
+                thumbnailImage = thumbnailImage.replace('%IMG_ID%', img_id)
 
             additionalInfoLabels = {'duration': duration,
                                     'plot': episode.get('articleshort', '')}
@@ -97,7 +108,7 @@ def showEpisodes(id):
             if free=='1' and title!=None and id!=None:
                 params = {'action': '',
                           'id': id}
-                bromixbmc.addVideoLink(title, params=params, additionalInfoLabels=additionalInfoLabels)
+                bromixbmc.addVideoLink(title, params=params, thumbnailImage=thumbnailImage, fanart=fanart, additionalInfoLabels=additionalInfoLabels)
     xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle)
     return True
 
