@@ -5,6 +5,7 @@ import xbmcgui
 import xbmcaddon
 
 import os
+import re
 
 import pydevd
 pydevd.settrace('localhost', stdoutToServer=True, stderrToServer=True)
@@ -66,21 +67,34 @@ def showLibrary():
     return True
 
 def showEpisodes(id):
+    def _sort_key(d):
+        return d[1].get('sendestart', '').lower()
+    
     episodes = __now_client__.getEpisodes(id)
     episodes = episodes.get('content', {})
     page = episodes.get('page', '1')
     maxpage = episodes.get('maxpage', '1')
     episodes = episodes.get('filmlist', {})
     
-    for key in episodes:
-        episode = episodes.get(key, None)
-        if episode!=None:
+    sorted_episodes = sorted(episodes.items(), key=_sort_key, reverse=True)
+    
+    for item in sorted_episodes:
+        if len(item)>=2:
+            episode = item[1]
             title = episode.get('headlinelong', None)
             id = episode.get('id', None)
-            if title!=None and id!=None:
+            free = episode.get('free', '0')
+            duration = episode.get('duration', '00:00:00')
+            match = re.compile('(\d*)\:(\d*)\:(\d*)', re.DOTALL).findall(duration)
+            if match!=None and len(match[0])>=3:
+                duration = match[0][1]
+
+            additionalInfoLabels = {'duration': duration}
+                
+            if free=='1' and title!=None and id!=None:
                 params = {'action': '',
                           'id': id}
-                bromixbmc.addVideoLink(title, params = params)
+                bromixbmc.addVideoLink(title, params=params, additionalInfoLabels=additionalInfoLabels)
     xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle)
     return True
 
