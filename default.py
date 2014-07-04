@@ -12,6 +12,10 @@ pydevd.settrace('localhost', stdoutToServer=True, stderrToServer=True)
 from bromixbmc import Bromixbmc
 bromixbmc = Bromixbmc("plugin.video.vox_now", sys.argv)
 
+from rtlinteractive import Now
+
+__now_client__ = Now(now.__CONFIG_VOX_NOW__)
+
 __FANART__ = os.path.join(bromixbmc.Addon.Path, "fanart.jpg")
 __ICON_HIGHLIGHTS__ = os.path.join(bromixbmc.Addon.Path, "resources/media/highlight.png")
 __ICON_LIBRARY__ = os.path.join(bromixbmc.Addon.Path, "resources/media/library.png")
@@ -27,7 +31,7 @@ def showIndex():
     xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle)
     return True
 
-def showLibrary():
+def showLibrary(): 
     xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle)
     return True
 
