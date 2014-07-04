@@ -52,7 +52,21 @@ def showLibrary():
     return True
 
 def showEpisodes(id):
+    episodes = __now_client__.getEpisodes(id)
+    episodes = episodes.get('content', {})
+    page = episodes.get('page', '1')
+    maxpage = episodes.get('maxpage', '1')
+    episodes = episodes.get('filmlist', {})
     
+    for key in episodes:
+        episode = episodes.get(key, None)
+        if episode!=None:
+            title = episode.get('headlinelong', None)
+            id = episode.get('id', None)
+            if title!=None and id!=None:
+                params = {'action': '',
+                          'id': id}
+                bromixbmc.addVideoLink(title, params = params)
     xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle)
     return True
 

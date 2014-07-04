@@ -119,6 +119,11 @@ class Client:
         return result
         
     def getShows(self):
-        result = self._request('/api/query/json/content.list_formats')
-        
-        return result
+        return self._request('/api/query/json/content.list_formats')
+    
+    def getEpisodes(self, format_id, amount='25', page='1'):
+        params = {'userid': '0',
+                  'formatid': format_id,
+                  'amount': amount,
+                  'page': page}
+        return self._request('/api/query/json/content.list_films', params)
