@@ -1,1 +1,1 @@
-from now import Now
+import now

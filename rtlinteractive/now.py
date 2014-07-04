@@ -20,7 +20,7 @@ __CONFIG_VOX_NOW__ = {'salt_phone': '9fb130b5-447e-4bbc-a44a-406f2d10d963',
                                       }
                       }
 
-class Now:
+class Client:
     def __init__(self, config):
         self.Config = config
         
