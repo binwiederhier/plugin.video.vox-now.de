@@ -6,6 +6,7 @@
 	<string id="30002">Newest</string>
 	<string id="30003">Top 10</string>
 	<string id="30004">Search</string>
+	<string id="30005">Live stream</string>
 	
 	<string id="30005">Add to addon favs</string>
 	<string id="30006">Remove</string>
@@ -14,4 +15,7 @@
 	<!-- Settings -->
 	<string id="30500">Show fanart</string>
 	<string id="30501">Show publication date in title</string>
+	<string id="30502">Quality of live stream</string>
+	<string id="30503">Medium</string>
+	<string id="30504">High</string>
 </strings>

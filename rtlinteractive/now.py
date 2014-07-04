@@ -10,6 +10,7 @@ import urllib2
 import json
 import time
 import hashlib
+import uuid
 
 __CONFIG_VOX_NOW__ = {'salt_phone': '9fb130b5-447e-4bbc-a44a-406f2d10d963',
                       'salt_tablet': '0df2738e-6fce-4c44-adaf-9981902de81b',
@@ -118,6 +119,11 @@ class Client:
             pass
         
         return result
+    
+    def _createSessionId(self):
+        sId = str(uuid.uuid4())
+        sId = sId.replace('-', '')
+        return sId
         
     def getShows(self):
         return self._request('/api/query/json/content.list_formats')
@@ -142,6 +148,10 @@ class Client:
         params = {'word': text,
                   'extend': '1'}
         return self._request('/api/query/json/content.format_search', params)
+    
+    def getLivestreams(self):
+        params = {'sessionid': self._createSessionId()}
+        return self._request('/api/query/json/livestream.available', params)
     
     def getEpisodeThumbnailImage(self, episode):
         url = ''

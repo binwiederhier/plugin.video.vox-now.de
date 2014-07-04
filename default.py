@@ -22,6 +22,7 @@ __ICON_HIGHLIGHTS__ = os.path.join(bromixbmc.Addon.Path, "resources/media/highli
 __ICON_LIBRARY__ = os.path.join(bromixbmc.Addon.Path, "resources/media/library.png")
 __ICON_FAVOURITES__ = os.path.join(bromixbmc.Addon.Path, "resources/media/pin.png")
 __ICON_SEARCH__ = os.path.join(bromixbmc.Addon.Path, "resources/media/search.png")
+__ICON_LIVE__ = os.path.join(bromixbmc.Addon.Path, "resources/media/highlight.png")
 
 __ACTION_SHOW_LIBRARY__ = 'showLibrary'
 __ACTION_SHOW_TIPS__ = 'showTips'
@@ -29,6 +30,7 @@ __ACTION_SHOW_NEWEST__ = 'showNewest'
 __ACTION_SHOW_TOP10__ = 'showTop10'
 __ACTION_SHOW_EPISODES__ = 'showEpisodes'
 __ACTION_SEARCH__ = 'search'
+__ACTION_LIVE_STREAM__ = 'playLivestream'
 
 __SETTING_SHOW_FANART__ = bromixbmc.Addon.getSetting('showFanart')=="true"
 __SETTING_SHOW_PUCLICATION_DATE__ = bromixbmc.Addon.getSetting('showPublicationDate')=="true"
@@ -49,6 +51,9 @@ def showIndex():
     
     params = {'action': __ACTION_SEARCH__}
     bromixbmc.addDir(bromixbmc.Addon.localize(30004), params = params, thumbnailImage=__ICON_SEARCH__, fanart=__FANART__)
+    
+    params = {'action': __ACTION_LIVE_STREAM__}
+    bromixbmc.addVideoLink(bromixbmc.Addon.localize(30005), params = params, thumbnailImage=__ICON_LIVE__, fanart=__FANART__)
     
     xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle)
     return True
@@ -218,6 +223,24 @@ def search():
     xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle, succeeded=success)
     return True
 
+def playLivestream():
+    streams = __now_client__.getLivestreams()
+    
+    lsq = bromixbmc.Addon.getSetting('liveStreamQuality')
+    key = 'high_android4'
+    if lsq=='1':
+        key='high_android4'
+    elif lsq=='0':
+        key='high_android2'
+    else:
+        key='high_android4'
+    
+    url = streams.get(key, None)
+    if url!=None:
+        listitem = xbmcgui.ListItem(path=url)
+        xbmcplugin.setResolvedUrl(bromixbmc.Addon.Handle, True, listitem) 
+    pass
+
 action = bromixbmc.getParam('action')
 id = bromixbmc.getParam('id')
 
@@ -233,5 +256,7 @@ elif action == __ACTION_SHOW_EPISODES__ and id!=None:
     showEpisodes(id)
 elif action == __ACTION_SEARCH__:
     search()
+elif action == __ACTION_LIVE_STREAM__:
+    playLivestream()
 else:
     showIndex()
