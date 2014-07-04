@@ -24,6 +24,8 @@ __ICON_FAVOURITES__ = os.path.join(bromixbmc.Addon.Path, "resources/media/pin.pn
 __ACTION_SHOW_LIBRARY__ = 'showLibrary'
 __ACTION_SHOW_EPISODES__ = 'showEpisodes'
 
+__SETTING_SHOW_FANART__ = bromixbmc.Addon.getSetting('showFanart')=="true"
+
 def showIndex():
     # add 'Sendungen A-Z'
     params = {'action': __ACTION_SHOW_LIBRARY__}
@@ -32,21 +34,33 @@ def showIndex():
     xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle)
     return True
 
-def showLibrary(): 
+def showLibrary():
+    def _sort_key(d):
+        return d[1].get('formatlong', '').lower()
+     
     shows = __now_client__.getShows()
     shows = shows.get('content', {})
     shows = shows.get('formatlist', {})
     
-    for key in shows:
-        show = shows.get(key, None)
-        if show!=None: 
+    sorted_shows = sorted(shows.items(), key=_sort_key, reverse=False)
+    
+    for item in sorted_shows:
+        if len(item)>=2:
+            show = item[1]
             title = show.get('formatlong', None)
             id = show.get('formatid', None)
+            free_episodes = int(show.get('free_episodes', '0'))
+            fanart = None
+            if __SETTING_SHOW_FANART__:
+                fanart = show.get('bigaufmacherimg', '')
+                fanart = fanart.replace('/640x360/', '/768x432/')
+                
+            thumbnailImage = show.get('biggalerieimg', '')
             
-            if title!=None and id!=None:
+            if free_episodes>=1 and title!=None and id!=None:
                 params = {'action': __ACTION_SHOW_EPISODES__,
                           'id': id}
-                bromixbmc.addDir(title, params=params)
+                bromixbmc.addDir(title, params=params, thumbnailImage=thumbnailImage, fanart=fanart)
     
     xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle)
     return True
@@ -75,7 +89,7 @@ id = bromixbmc.getParam('id')
 
 if action == __ACTION_SHOW_LIBRARY__:
     showLibrary()
-if action == __ACTION_SHOW_EPISODES__ and id!=None:
+elif action == __ACTION_SHOW_EPISODES__ and id!=None:
     showEpisodes(id)
 else:
     showIndex()
