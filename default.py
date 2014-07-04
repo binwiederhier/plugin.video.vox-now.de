@@ -67,13 +67,13 @@ def showLibrary():
     xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle)
     return True
 
-def showEpisodes(id):
+def _listEpisodes(episodes):
     xbmcplugin.setContent(bromixbmc.Addon.Handle, 'episodes')
     
     def _sort_key(d):
         return d[1].get('sendestart', '').lower()
     
-    episodes = __now_client__.getEpisodes(id)
+    
     episodes = episodes.get('content', {})
     page = episodes.get('page', '1')
     maxpage = episodes.get('maxpage', '1')
@@ -126,6 +126,10 @@ def showEpisodes(id):
                 bromixbmc.addVideoLink(title, params=params, thumbnailImage=thumbnailImage, fanart=fanart, additionalInfoLabels=additionalInfoLabels)
     xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle)
     return True
+
+def showEpisodes(id):
+    episodes = __now_client__.getEpisodes(id)
+    _listEpisodes(episodes)
 
 action = bromixbmc.getParam('action')
 id = bromixbmc.getParam('id')
