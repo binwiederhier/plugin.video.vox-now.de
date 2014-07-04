@@ -23,6 +23,9 @@ __ICON_LIBRARY__ = os.path.join(bromixbmc.Addon.Path, "resources/media/library.p
 __ICON_FAVOURITES__ = os.path.join(bromixbmc.Addon.Path, "resources/media/pin.png")
 
 __ACTION_SHOW_LIBRARY__ = 'showLibrary'
+__ACTION_SHOW_TIPS__ = 'showTips'
+__ACTION_SHOW_NEWEST__ = 'showNewest'
+__ACTION_SHOW_TOP10__ = 'showTop10'
 __ACTION_SHOW_EPISODES__ = 'showEpisodes'
 
 __SETTING_SHOW_FANART__ = bromixbmc.Addon.getSetting('showFanart')=="true"
@@ -32,6 +35,15 @@ def showIndex():
     # add 'Sendungen A-Z'
     params = {'action': __ACTION_SHOW_LIBRARY__}
     bromixbmc.addDir(bromixbmc.Addon.localize(30000), params = params, thumbnailImage=__ICON_LIBRARY__, fanart=__FANART__)
+    
+    params = {'action': __ACTION_SHOW_TIPS__}
+    bromixbmc.addDir(bromixbmc.Addon.localize(30001), params = params, thumbnailImage=__ICON_HIGHLIGHTS__, fanart=__FANART__)
+    
+    params = {'action': __ACTION_SHOW_NEWEST__}
+    bromixbmc.addDir(bromixbmc.Addon.localize(30002), params = params, thumbnailImage=__ICON_HIGHLIGHTS__, fanart=__FANART__)
+    
+    params = {'action': __ACTION_SHOW_TOP10__}
+    bromixbmc.addDir(bromixbmc.Addon.localize(30003), params = params, thumbnailImage=__ICON_HIGHLIGHTS__, fanart=__FANART__)
     
     xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle)
     return True
@@ -127,6 +139,18 @@ def _listEpisodes(episodes):
     xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle)
     return True
 
+def showTips():
+    episodes = __now_client__.getTips()
+    _listEpisodes(episodes)
+    
+def showNewest():
+    episodes = __now_client__.getNewest()
+    _listEpisodes(episodes)
+    
+def showTop10():
+    episodes = __now_client__.getTop10()
+    _listEpisodes(episodes)
+
 def showEpisodes(id):
     episodes = __now_client__.getEpisodes(id)
     _listEpisodes(episodes)
@@ -136,6 +160,12 @@ id = bromixbmc.getParam('id')
 
 if action == __ACTION_SHOW_LIBRARY__:
     showLibrary()
+elif action == __ACTION_SHOW_TIPS__:
+    showTips()
+elif action == __ACTION_SHOW_NEWEST__:
+    showNewest()
+elif action == __ACTION_SHOW_TOP10__:
+    showTop10()
 elif action == __ACTION_SHOW_EPISODES__ and id!=None:
     showEpisodes(id)
 else:
