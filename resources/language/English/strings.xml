@@ -5,10 +5,11 @@
 	<string id="30001">Tips</string>
 	<string id="30002">Newest</string>
 	<string id="30003">Top 10</string>
+	<string id="30004">Search</string>
 	
-	<string id="30004">Add to addon favs</string>
-	<string id="30005">Remove</string>
-	<string id="30006">Favorites</string>
+	<string id="30005">Add to addon favs</string>
+	<string id="30006">Remove</string>
+	<string id="30007">Favorites</string>
 
 	<!-- Settings -->
 	<string id="30500">Show fanart</string>

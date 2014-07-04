@@ -21,12 +21,14 @@ __FANART__ = os.path.join(bromixbmc.Addon.Path, "fanart.jpg")
 __ICON_HIGHLIGHTS__ = os.path.join(bromixbmc.Addon.Path, "resources/media/highlight.png")
 __ICON_LIBRARY__ = os.path.join(bromixbmc.Addon.Path, "resources/media/library.png")
 __ICON_FAVOURITES__ = os.path.join(bromixbmc.Addon.Path, "resources/media/pin.png")
+__ICON_SEARCH__ = os.path.join(bromixbmc.Addon.Path, "resources/media/search.png")
 
 __ACTION_SHOW_LIBRARY__ = 'showLibrary'
 __ACTION_SHOW_TIPS__ = 'showTips'
 __ACTION_SHOW_NEWEST__ = 'showNewest'
 __ACTION_SHOW_TOP10__ = 'showTop10'
 __ACTION_SHOW_EPISODES__ = 'showEpisodes'
+__ACTION_SEARCH__ = 'search'
 
 __SETTING_SHOW_FANART__ = bromixbmc.Addon.getSetting('showFanart')=="true"
 __SETTING_SHOW_PUCLICATION_DATE__ = bromixbmc.Addon.getSetting('showPublicationDate')=="true"
@@ -44,6 +46,9 @@ def showIndex():
     
     params = {'action': __ACTION_SHOW_TOP10__}
     bromixbmc.addDir(bromixbmc.Addon.localize(30003), params = params, thumbnailImage=__ICON_HIGHLIGHTS__, fanart=__FANART__)
+    
+    params = {'action': __ACTION_SEARCH__}
+    bromixbmc.addDir(bromixbmc.Addon.localize(30004), params = params, thumbnailImage=__ICON_SEARCH__, fanart=__FANART__)
     
     xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle)
     return True
@@ -188,6 +193,30 @@ def showEpisodes(id):
                                   'sort_reverse': True,
                                   'title_func': _get_title}
                   )
+    
+def search():
+    success = False
+    keyboard = xbmc.Keyboard('', bromixbmc.Addon.localize(30004))
+    keyboard.doModal()
+    if keyboard.isConfirmed() and keyboard.getText():
+        success = True
+        
+        search_string = keyboard.getText().replace(" ", "+")
+        result = __now_client__.search(search_string)
+        result = result.get('content', {})
+        result = result.get('list', {})
+        for key in result:
+            item = result.get(key,None)
+            if item!=None:
+                title = item.get('result', None)
+                id = item.get('formatid', None)
+                if title!=None and id!=None:
+                    params = {'action': __ACTION_SHOW_EPISODES__,
+                              'id': id}
+                    bromixbmc.addDir(title, params=params)
+        
+    xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle, succeeded=success)
+    return True
 
 action = bromixbmc.getParam('action')
 id = bromixbmc.getParam('id')
@@ -202,5 +231,7 @@ elif action == __ACTION_SHOW_TOP10__:
     showTop10()
 elif action == __ACTION_SHOW_EPISODES__ and id!=None:
     showEpisodes(id)
+elif action == __ACTION_SEARCH__:
+    search()
 else:
     showIndex()

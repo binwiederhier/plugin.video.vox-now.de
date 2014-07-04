@@ -138,6 +138,11 @@ class Client:
                   'page': page}
         return self._request('/api/query/json/content.list_films', params)
     
+    def search(self, text):
+        params = {'word': text,
+                  'extend': '1'}
+        return self._request('/api/query/json/content.format_search', params)
+    
     def getEpisodeThumbnailImage(self, episode):
         url = ''
         
