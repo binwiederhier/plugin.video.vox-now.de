@@ -17,6 +17,7 @@ __CONFIG_VOX_NOW__ = {'salt_phone': '9fb130b5-447e-4bbc-a44a-406f2d10d963',
                       'key_tablet': '2e99d88e-088e-4108-a319-c94ba825fe29',
                       'url': 'https://www.voxnow.de',
                       'id': '41',
+                      'episode-thumbnail-url': 'http://autoimg.rtl.de/voxnow/%PIC_ID%/660x660/formatimage.jpg',
                       'http-header': {'X-App-Name': 'VOX NOW App',
                                       'X-Device-Type': 'voxnow_android',
                                       'X-App-Version': '1.3.1',
@@ -127,3 +128,13 @@ class Client:
                   'amount': amount,
                   'page': page}
         return self._request('/api/query/json/content.list_films', params)
+    
+    def getEpisodeThumbnailImage(self, episode):
+        url = ''
+        
+        pic_id = episode.get('pictures', {}).get('pic_0', None)
+        if pic_id!=None:
+            url = self.Config.get('episode-thumbnail-url', '')
+            url = url.replace('%PIC_ID%', pic_id)
+        
+        return url

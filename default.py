@@ -8,6 +8,7 @@ import os
 import re
 
 import pydevd
+from copy_reg import __newobj__
 pydevd.settrace('localhost', stdoutToServer=True, stderrToServer=True)
 
 from bromixbmc import Bromixbmc
@@ -96,11 +97,7 @@ def showEpisodes(id):
                 fanart = episode.get('bigaufmacherimg', '')
                 fanart = fanart.replace('/640x360/', '/768x432/')
                 
-            thumbnailImage = ''
-            img_id = episode.get('pictures', {}).get('pic_0', None)
-            if img_id!=None:
-                thumbnailImage = 'http://autoimg.rtl.de/voxnow/%IMG_ID%/660x660/formatimage.jpg'
-                thumbnailImage = thumbnailImage.replace('%IMG_ID%', img_id)
+            thumbnailImage = __now_client__.getEpisodeThumbnailImage(episode)
 
             additionalInfoLabels = {'duration': duration,
                                     'plot': episode.get('articleshort', '')}
