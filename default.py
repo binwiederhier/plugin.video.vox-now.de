@@ -82,26 +82,17 @@ def showLibrary():
 def _listEpisodes(episodes, func={}):
     xbmcplugin.setContent(bromixbmc.Addon.Handle, 'episodes')
     
-    def _sort_key(d):
-        return d[1].get('sendestart', '').lower()
-    
-    
     episodes = episodes.get('content', {})
     page = episodes.get('page', '1')
     maxpage = episodes.get('maxpage', '1')
     episodes = episodes.get('filmlist', {})
-    
-    #fallback
-    sort_key_method = _sort_key
-    if func.get('sort_func', None)!=None:
-        sort_key_method = func.get('sort_func', None)
         
-    sorted_episodes = sorted(episodes.items(), key=sort_key_method, reverse=func.get('sort_reverse', True))
+    sorted_episodes = sorted(episodes.items(), key=func.get('sort_func', None), reverse=func.get('sort_reverse', True))
     
     for item in sorted_episodes:
         if len(item)>=2:
             episode = item[1]
-            title = episode.get('headlinelong', None)
+            title = func.get('title_func', None)(episode)
             id = episode.get('id', None)
             free = episode.get('free', '0')
             duration = episode.get('duration', '00:00:00')
@@ -147,29 +138,55 @@ def _listEpisodes(episodes, func={}):
     return True
 
 def showTips():
+    def _sort_key(d):
+        return d[0]
+    
+    def _get_title(d):
+        return d.get('formatlong', '')+" - "+d.get('headlinelong', '')
+    
     episodes = __now_client__.getTips()
-    _listEpisodes(episodes)
+    _listEpisodes(episodes, func={'sort_func': _sort_key,
+                                  'sort_reverse': False,
+                                  'title_func': _get_title}
+                  )
     
 def showNewest():
+    def _sort_key(d):
+        return d[0]
+    
+    def _get_title(d):
+        return d.get('formatlong', '')+" - "+d.get('headlinelong', '')
+    
     episodes = __now_client__.getNewest()
-    _listEpisodes(episodes)
+    _listEpisodes(episodes, func={'sort_func': _sort_key,
+                                  'sort_reverse': False,
+                                  'title_func': _get_title}
+                  )
     
 def showTop10():
     def _sort_key(d):
         return d[0]
     
+    def _get_title(d):
+        return d.get('formatlong', '')+" - "+d.get('headlinelong', '')
+    
     episodes = __now_client__.getTop10()
     _listEpisodes(episodes, func={'sort_func': _sort_key,
-                                  'sort_reverse': False}
+                                  'sort_reverse': False,
+                                  'title_func': _get_title}
                   )
 
 def showEpisodes(id):
     def _sort_key(d):
         return d[1].get('sendestart', '').lower()
     
+    def _get_title(d):
+        return d.get('headlinelong', '')
+    
     episodes = __now_client__.getEpisodes(id)
     _listEpisodes(episodes, func={'sort_func': _sort_key,
-                                  'sort_reverse': True}
+                                  'sort_reverse': True,
+                                  'title_func': _get_title}
                   )
 
 action = bromixbmc.getParam('action')
