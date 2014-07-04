@@ -7,8 +7,8 @@ import xbmcaddon
 import os
 import re
 
-import pydevd
-pydevd.settrace('localhost', stdoutToServer=True, stderrToServer=True)
+#import pydevd
+#pydevd.settrace('localhost', stdoutToServer=True, stderrToServer=True)
 
 from bromixbmc import Bromixbmc
 bromixbmc = Bromixbmc("plugin.video.vox_now", sys.argv)
@@ -79,7 +79,7 @@ def showLibrary():
     xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle)
     return True
 
-def _listEpisodes(episodes):
+def _listEpisodes(episodes, func={}):
     xbmcplugin.setContent(bromixbmc.Addon.Handle, 'episodes')
     
     def _sort_key(d):
@@ -91,7 +91,12 @@ def _listEpisodes(episodes):
     maxpage = episodes.get('maxpage', '1')
     episodes = episodes.get('filmlist', {})
     
-    sorted_episodes = sorted(episodes.items(), key=_sort_key, reverse=True)
+    #fallback
+    sort_key_method = _sort_key
+    if func.get('sort_func', None)!=None:
+        sort_key_method = func.get('sort_func', None)
+        
+    sorted_episodes = sorted(episodes.items(), key=sort_key_method, reverse=func.get('sort_reverse', True))
     
     for item in sorted_episodes:
         if len(item)>=2:
@@ -102,7 +107,9 @@ def _listEpisodes(episodes):
             duration = episode.get('duration', '00:00:00')
             match = re.compile('(\d*)\:(\d*)\:(\d*)', re.DOTALL).findall(duration)
             if match!=None and len(match[0])>=3:
-                duration = match[0][1]
+                hours = int(match[0][0])
+                minutes = hours*60 + int(match[0][1]) 
+                duration = str(minutes)
 
             year = ''
             aired = ''
@@ -148,12 +155,22 @@ def showNewest():
     _listEpisodes(episodes)
     
 def showTop10():
+    def _sort_key(d):
+        return d[0]
+    
     episodes = __now_client__.getTop10()
-    _listEpisodes(episodes)
+    _listEpisodes(episodes, func={'sort_func': _sort_key,
+                                  'sort_reverse': False}
+                  )
 
 def showEpisodes(id):
+    def _sort_key(d):
+        return d[1].get('sendestart', '').lower()
+    
     episodes = __now_client__.getEpisodes(id)
-    _listEpisodes(episodes)
+    _listEpisodes(episodes, func={'sort_func': _sort_key,
+                                  'sort_reverse': True}
+                  )
 
 action = bromixbmc.getParam('action')
 id = bromixbmc.getParam('id')
