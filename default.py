@@ -67,6 +67,8 @@ def showLibrary():
     return True
 
 def showEpisodes(id):
+    xbmcplugin.setContent(bromixbmc.Addon.Handle, 'episodes')
+    
     def _sort_key(d):
         return d[1].get('sendestart', '').lower()
     
@@ -89,7 +91,8 @@ def showEpisodes(id):
             if match!=None and len(match[0])>=3:
                 duration = match[0][1]
 
-            additionalInfoLabels = {'duration': duration}
+            additionalInfoLabels = {'duration': duration,
+                                    'plot': episode.get('articleshort', '')}
                 
             if free=='1' and title!=None and id!=None:
                 params = {'action': '',
