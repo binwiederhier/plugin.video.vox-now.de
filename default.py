@@ -100,7 +100,9 @@ def showEpisodes(id):
             thumbnailImage = __now_client__.getEpisodeThumbnailImage(episode)
 
             additionalInfoLabels = {'duration': duration,
-                                    'plot': episode.get('articleshort', '')}
+                                    'plot': episode.get('articleshort', ''),
+                                    'episode': episode.get('episode', ''),
+                                    'season': episode.get('season', '')}
                 
             if free=='1' and title!=None and id!=None:
                 params = {'action': '',
