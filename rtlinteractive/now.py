@@ -132,9 +132,14 @@ class Client:
     def getEpisodeThumbnailImage(self, episode):
         url = ''
         
-        pic_id = episode.get('pictures', {}).get('pic_0', None)
-        if pic_id!=None:
-            url = self.Config.get('episode-thumbnail-url', '')
-            url = url.replace('%PIC_ID%', pic_id)
+        pictures = episode.get('pictures', {})
+        if len(pictures)>0: 
+            pic_id = pictures.get('pic_0', None)
+            if pic_id!=None:
+                url = self.Config.get('episode-thumbnail-url', '')
+                url = url.replace('%PIC_ID%', pic_id)
+        else:
+            # fallback - show the fanart image
+            url = episode.get('bigaufmacherimg', '')
         
         return url

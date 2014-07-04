@@ -8,7 +8,6 @@ import os
 import re
 
 import pydevd
-from copy_reg import __newobj__
 pydevd.settrace('localhost', stdoutToServer=True, stderrToServer=True)
 
 from bromixbmc import Bromixbmc
@@ -27,6 +26,7 @@ __ACTION_SHOW_LIBRARY__ = 'showLibrary'
 __ACTION_SHOW_EPISODES__ = 'showEpisodes'
 
 __SETTING_SHOW_FANART__ = bromixbmc.Addon.getSetting('showFanart')=="true"
+__SETTING_SHOW_PUCLICATION_DATE__ = bromixbmc.Addon.getSetting('showPublicationDate')=="true"
 
 def showIndex():
     # add 'Sendungen A-Z'
@@ -98,6 +98,13 @@ def showEpisodes(id):
             if match!=None and len(match[0])>=3:
                 year = match[0][0]
                 aired = match[0][0]+"-"+match[0][1]+"-"+match[0][2]
+                if __SETTING_SHOW_PUCLICATION_DATE__:
+                    date_format = xbmc.getRegion('dateshort')
+                    
+                    date_format = date_format.replace('%d', match[0][0])
+                    date_format = date_format.replace('%m', match[0][1])
+                    date_format = date_format.replace('%Y', match[0][2])
+                    title = date_format+" - "+title
                 
             fanart = None
             if __SETTING_SHOW_FANART__:

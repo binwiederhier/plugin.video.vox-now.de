@@ -9,4 +9,5 @@
 
 	<!-- Settings -->
 	<string id="30500">Show fanart</string>
+	<string id="30501">Show publication date in title</string>
 </strings>
