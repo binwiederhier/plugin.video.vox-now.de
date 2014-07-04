@@ -22,6 +22,7 @@ __ICON_LIBRARY__ = os.path.join(bromixbmc.Addon.Path, "resources/media/library.p
 __ICON_FAVOURITES__ = os.path.join(bromixbmc.Addon.Path, "resources/media/pin.png")
 
 __ACTION_SHOW_LIBRARY__ = 'showLibrary'
+__ACTION_SHOW_EPISODES__ = 'showEpisodes'
 
 def showIndex():
     # add 'Sendungen A-Z'
@@ -32,12 +33,35 @@ def showIndex():
     return True
 
 def showLibrary(): 
+    shows = __now_client__.getShows()
+    shows = shows.get('content', {})
+    shows = shows.get('formatlist', {})
+    
+    for key in shows:
+        show = shows.get(key, None)
+        if show!=None: 
+            title = show.get('formatlong', None)
+            id = show.get('formatid', None)
+            
+            if title!=None and id!=None:
+                params = {'action': __ACTION_SHOW_EPISODES__,
+                          'id': id}
+                bromixbmc.addDir(title, params=params)
+    
+    xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle)
+    return True
+
+def showEpisodes(id):
+    
     xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle)
     return True
 
 action = bromixbmc.getParam('action')
+id = bromixbmc.getParam('id')
 
 if action == __ACTION_SHOW_LIBRARY__:
     showLibrary()
+if action == __ACTION_SHOW_EPISODES__ and id!=None:
+    showEpisodes(id)
 else:
     showIndex()

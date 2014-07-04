@@ -5,11 +5,17 @@ Version 1.0.1 (2014.07.04)
 - initial release
 """
 
+import urllib
+import urllib2
+import json
+import time
+import hashlib
+
 __CONFIG_VOX_NOW__ = {'salt_phone': '9fb130b5-447e-4bbc-a44a-406f2d10d963',
                       'salt_tablet': '0df2738e-6fce-4c44-adaf-9981902de81b',
                       'key_phone': 'b11f23ac-10f1-4335-acb8-ebaaabdb8cde',
                       'key_tablet': '2e99d88e-088e-4108-a319-c94ba825fe29',
-                      'url': 'www.voxnow.de',
+                      'url': 'https://www.voxnow.de',
                       'id': '41',
                       'http-header': {'X-App-Name': 'VOX NOW App',
                                       'X-Device-Type': 'voxnow_android',
@@ -24,16 +30,93 @@ class Client:
     def __init__(self, config):
         self.Config = config
         
-    def _getConnection(self):
+    def _calculateToken(self, timestamp, params={}):
+        token = ""
         
-        pass
-    
-    def _createQuery(self, params={}):
+        hashmap = {}
+        hashmap.update(params)
         
-        pass
-    
-    def _request(self):
-        pass
+        stringbuilder = ""
+        stringbuilder += self.Config.get('key_tablet', '')
+        stringbuilder += ";"
+        stringbuilder += self.Config.get('salt_tablet', '')
+        stringbuilder += ";"
+        stringbuilder += timestamp
+        
+        params = sorted(hashmap.items())
+        
+        for param in params:
+            stringbuilder += ";"
+            stringbuilder += param[1]
+        
+        if len(hashmap)==0:
+            stringbuilder += ";"
+           
+        try:
+            messagedigest = hashlib.md5()
+            messagedigest.update(stringbuilder);
+            abyte0 = messagedigest.digest();
+            length = len(abyte0);
+            
+            for b in bytearray(abyte0):
+                val = b
+                val = 0x100 | 0xFF & val
+                hval = hex(val).lower()
+                token += hval[3:]
+        except:
+            token = ""
+            
+        return token
+        
+    def _createQueryArgs(self, params={}):
+        result = {}
+        result.update(params)
+        
+        result['_key'] = self.Config.get('key_tablet', '')
+        timestamp = str(int(time.time()))
+        result['_ts'] = timestamp
+        result['_tk'] = self._calculateToken(timestamp, params)
+        result['_auth'] = 'integrity'
+        
+        return result
+        
+    def _createRequest(self, url_path, params={}):
+        if not url_path.startswith(self.Config.get('url', '')):
+            url = self.Config.get('url', '')
+            if not url.endswith('/') and not url_path.startswith('/'):
+                url+='/'
+            url = url+url_path
+
+        request = urllib2.Request(url)
+        
+        # always set the id
+        params['id'] = self.Config.get('id', '0')
+        
+        # prepare header
+        header = self.Config.get('http-header', {})
+        for key in header:
+            request.add_header(key, header.get(key, ''))
+            
+        # calculate token and set params
+        query_args = self._createQueryArgs(params)
+        request.add_data(urllib.urlencode(query_args))
+        return request
+                               
+    def _request(self, url_path, params={}):
+        request = self._createRequest(url_path, params)
+        
+        result = {}
+        try:
+            content = urllib2.urlopen(request)
+            result = json.load(content, encoding='utf-8')
+            success = result.get('success', False)
+            if success==True:
+                result = result.get('result', {})
+        except:
+            # do nothing
+            pass
+        
+        return result
         
     def getShows(self):
         result = self._request('/api/query/json/content.list_formats')
