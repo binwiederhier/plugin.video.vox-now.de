@@ -91,6 +91,13 @@ def showEpisodes(id):
             match = re.compile('(\d*)\:(\d*)\:(\d*)', re.DOTALL).findall(duration)
             if match!=None and len(match[0])>=3:
                 duration = match[0][1]
+
+            year = ''
+            aired = ''
+            match = re.compile('(\d*)\-(\d*)\-(\d*) (\d*)\:(\d*)\:(\d*)', re.DOTALL).findall(episode.get('sendestart', '0000-00-00'))
+            if match!=None and len(match[0])>=3:
+                year = match[0][0]
+                aired = match[0][0]+"-"+match[0][1]+"-"+match[0][2]
                 
             fanart = None
             if __SETTING_SHOW_FANART__:
@@ -102,7 +109,9 @@ def showEpisodes(id):
             additionalInfoLabels = {'duration': duration,
                                     'plot': episode.get('articleshort', ''),
                                     'episode': episode.get('episode', ''),
-                                    'season': episode.get('season', '')}
+                                    'season': episode.get('season', ''),
+                                    'year': year,
+                                    'aired': aired}
                 
             if free=='1' and title!=None and id!=None:
                 params = {'action': '',
