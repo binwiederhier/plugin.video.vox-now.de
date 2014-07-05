@@ -34,6 +34,7 @@ __ACTION_LIVE_STREAM__ = 'playLivestream'
 __ACTION_SHOW_FAVS__ = 'showFavs'
 __ACTION_ADD_FAV__ = 'addFav'
 __ACTION_REMOVE_FAV__ = 'removeFav'
+__ACTION_PLAY__ = 'play'
 
 __SETTING_SHOW_FANART__ = bromixbmc.Addon.getSetting('showFanart')=="true"
 __SETTING_SHOW_PUCLICATION_DATE__ = bromixbmc.Addon.getSetting('showPublicationDate')=="true"
@@ -156,7 +157,7 @@ def _listEpisodes(episodes, func={}):
                                     'aired': aired}
                 
             if free=='1' and title!=None and id!=None:
-                params = {'action': '',
+                params = {'action': __ACTION_PLAY__,
                           'id': id}
                 bromixbmc.addVideoLink(title, params=params, thumbnailImage=thumbnailImage, fanart=fanart, additionalInfoLabels=additionalInfoLabels)
     xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle)
@@ -300,6 +301,13 @@ def showFavs():
     xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle)
     return True
 
+def play(id):
+    url = __now_client__.getEpisodeVideoUrl(id)
+    if url!=None:
+        listitem = xbmcgui.ListItem(path=url)
+        xbmcplugin.setResolvedUrl(bromixbmc.Addon.Handle, True, listitem) 
+    pass
+
 action = bromixbmc.getParam('action')
 id = bromixbmc.getParam('id')
 
@@ -323,5 +331,7 @@ elif action == __ACTION_ADD_FAV__ and id!=None:
     addFav(id)
 elif action == __ACTION_REMOVE_FAV__ and id!=None:
     removeFav(id)
+elif action == __ACTION_PLAY__ and id!=None:
+    play(id)
 else:
     showIndex()
