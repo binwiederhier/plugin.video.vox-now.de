@@ -15,7 +15,9 @@ bromixbmc = Bromixbmc("plugin.video.vox_now", sys.argv)
 
 import rtlinteractive
 
+#__now_client__ = rtlinteractive.now.Client(rtlinteractive.now.__CONFIG_RTL_NOW__)
 __now_client__ = rtlinteractive.now.Client(rtlinteractive.now.__CONFIG_VOX_NOW__)
+#__now_client__ = rtlinteractive.now.Client(rtlinteractive.now.__CONFIG_RTL2_NOW__)
 
 __FANART__ = os.path.join(bromixbmc.Addon.Path, "fanart.jpg")
 __ICON_HIGHLIGHTS__ = os.path.join(bromixbmc.Addon.Path, "resources/media/highlight.png")

@@ -14,6 +14,38 @@ import uuid
 import re
 import random
 
+__CONFIG_RTL_NOW__ = {'salt_phone': 'ba647945-6989-477b-9767-870790fcf552',
+                      'salt_tablet': 'ba647945-6989-477b-9767-870790fcf552',
+                      'key_phone': '46f63897-89aa-44f9-8f70-f0052050fe59',
+                      'key_tablet': '56f63897-89aa-44f9-8f70-f0052050fe59',
+                      'url': 'https://rtl-now.rtl.de',
+                      'id': '9',
+                      'episode-thumbnail-url': 'http://autoimg.rtl.de/rtlnow/%PIC_ID%/660x660/formatimage.jpg',
+                      'http-header': {'X-App-Name': 'RTL NOW App',
+                                      'X-Device-Type': 'rtlnow_android',
+                                      'X-App-Version': '1.3.1',
+                                      'X-Device-Checksum': 'ed0226e4e613e4cd81c6257bced1cb1b',
+                                      'Host': 'www.rtlnow.de',
+                                      'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.2; GT-I9505 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Mobile Safari/537.36'
+                                      }
+                      }
+
+__CONFIG_RTL2_NOW__ = {'salt_phone': '9be405a6-2d5c-4e62-8ba0-ba2b5f11072d',
+                      'salt_tablet': '4bfab4aa-705a-4e8c-b1a7-b551b1b2613f',
+                      'key_phone': '26c0d1ac-e6a0-4df9-9f79-e07727f33380',
+                      'key_tablet': '83bbc955-c96e-4b50-b263-bc7bcbcdf8c8',
+                      'url': 'https://rtl2now.rtl2.de',
+                      'id': '37',
+                      'episode-thumbnail-url': 'http://autoimg.rtl.de/rtl2now/%PIC_ID%/660x660/formatimage.jpg',
+                      'http-header': {'X-App-Name': 'RTL II NOW App',
+                                      'X-Device-Type': 'rtl2now_android',
+                                      'X-App-Version': '1.3.1',
+                                      'X-Device-Checksum': 'ed0226e4e613e4cd81c6257bced1cb1b',
+                                      'Host': 'rtl2now.rtl2.de',
+                                      'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.2; GT-I9505 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Mobile Safari/537.36'
+                                      }
+                      }
+
 __CONFIG_VOX_NOW__ = {'salt_phone': '9fb130b5-447e-4bbc-a44a-406f2d10d963',
                       'salt_tablet': '0df2738e-6fce-4c44-adaf-9981902de81b',
                       'key_phone': 'b11f23ac-10f1-4335-acb8-ebaaabdb8cde',
