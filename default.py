@@ -165,9 +165,6 @@ def _listEpisodes(episodes, format_id, func={}):
                           'id': id}
                 bromixbmc.addVideoLink(title, params=params, thumbnailImage=thumbnailImage, fanart=fanart, additionalInfoLabels=additionalInfoLabels)
                 show_next = True
-            elif free=='0':
-                show_next = False
-                break
                 
     if page<maxpage and show_next:
         params = {'action': __ACTION_SHOW_EPISODES__,
