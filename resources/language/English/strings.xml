@@ -11,6 +11,8 @@
 	<string id="30006">Add to addon favs</string>
 	<string id="30007">Remove</string>
 	<string id="30008">Favorites</string>
+	
+	<string id="30009">Next Page</string>
 
 	<!-- Settings -->
 	<string id="30500">Show fanart</string>

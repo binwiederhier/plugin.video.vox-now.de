@@ -25,7 +25,7 @@ __CONFIG_RTL_NOW__ = {'salt_phone': 'ba647945-6989-477b-9767-870790fcf552',
                                       'X-Device-Type': 'rtlnow_android',
                                       'X-App-Version': '1.3.1',
                                       'X-Device-Checksum': 'ed0226e4e613e4cd81c6257bced1cb1b',
-                                      'Host': 'www.rtlnow.de',
+                                      'Host': 'rtl-now.rtl.de',
                                       'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.2; GT-I9505 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Mobile Safari/537.36'
                                       }
                       }
