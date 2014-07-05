@@ -59,8 +59,9 @@ def showIndex():
     params = {'action': __ACTION_LIVE_STREAM__}
     bromixbmc.addVideoLink(bromixbmc.Addon.localize(30005), params = params, thumbnailImage=__ICON_LIVE__, fanart=__FANART__)
     
-    params = {'action': __ACTION_SHOW_FAVS__}
-    bromixbmc.addDir(bromixbmc.Addon.localize(30008), params = params, thumbnailImage=__ICON_FAVOURITES__, fanart=__FANART__)
+    if len(bromixbmc.Addon.getFavorites())>0:
+        params = {'action': __ACTION_SHOW_FAVS__}
+        bromixbmc.addDir("[B]"+bromixbmc.Addon.localize(30008)+"[/B]", params = params, thumbnailImage=__ICON_FAVOURITES__, fanart=__FANART__)
     
     xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle)
     return True
