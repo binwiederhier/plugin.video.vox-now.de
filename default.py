@@ -20,11 +20,12 @@ __now_client__ = rtlinteractive.now.Client(rtlinteractive.now.__CONFIG_VOX_NOW__
 #__now_client__ = rtlinteractive.now.Client(rtlinteractive.now.__CONFIG_RTL2_NOW__)
 
 __FANART__ = os.path.join(bromixbmc.Addon.Path, "fanart.jpg")
+__ICON_FAVOURITES__ = os.path.join(bromixbmc.Addon.Path, "resources/media/favorites.png")
+__ICON_NEWEST__ = os.path.join(bromixbmc.Addon.Path, "resources/media/newest.png")
 __ICON_HIGHLIGHTS__ = os.path.join(bromixbmc.Addon.Path, "resources/media/highlight.png")
 __ICON_LIBRARY__ = os.path.join(bromixbmc.Addon.Path, "resources/media/library.png")
-__ICON_FAVOURITES__ = os.path.join(bromixbmc.Addon.Path, "resources/media/pin.png")
 __ICON_SEARCH__ = os.path.join(bromixbmc.Addon.Path, "resources/media/search.png")
-__ICON_LIVE__ = os.path.join(bromixbmc.Addon.Path, "resources/media/highlight.png")
+__ICON_LIVE__ = os.path.join(bromixbmc.Addon.Path, "resources/media/livestream.png")
 
 __ACTION_SHOW_LIBRARY__ = 'showLibrary'
 __ACTION_SHOW_TIPS__ = 'showTips'
@@ -42,15 +43,19 @@ __SETTING_SHOW_FANART__ = bromixbmc.Addon.getSetting('showFanart')=="true"
 __SETTING_SHOW_PUCLICATION_DATE__ = bromixbmc.Addon.getSetting('showPublicationDate')=="true"
 
 def showIndex():
+    if len(bromixbmc.Addon.getFavorites())>0:
+        params = {'action': __ACTION_SHOW_FAVS__}
+        bromixbmc.addDir("[B]"+bromixbmc.Addon.localize(30008)+"[/B]", params = params, thumbnailImage=__ICON_FAVOURITES__, fanart=__FANART__)
+        
     # add 'Sendungen A-Z'
     params = {'action': __ACTION_SHOW_LIBRARY__}
     bromixbmc.addDir(bromixbmc.Addon.localize(30000), params = params, thumbnailImage=__ICON_LIBRARY__, fanart=__FANART__)
     
+    params = {'action': __ACTION_SHOW_NEWEST__}
+    bromixbmc.addDir(bromixbmc.Addon.localize(30002), params = params, thumbnailImage=__ICON_NEWEST__, fanart=__FANART__)
+    
     params = {'action': __ACTION_SHOW_TIPS__}
     bromixbmc.addDir(bromixbmc.Addon.localize(30001), params = params, thumbnailImage=__ICON_HIGHLIGHTS__, fanart=__FANART__)
-    
-    params = {'action': __ACTION_SHOW_NEWEST__}
-    bromixbmc.addDir(bromixbmc.Addon.localize(30002), params = params, thumbnailImage=__ICON_HIGHLIGHTS__, fanart=__FANART__)
     
     params = {'action': __ACTION_SHOW_TOP10__}
     bromixbmc.addDir(bromixbmc.Addon.localize(30003), params = params, thumbnailImage=__ICON_HIGHLIGHTS__, fanart=__FANART__)
@@ -60,10 +65,6 @@ def showIndex():
     
     params = {'action': __ACTION_LIVE_STREAM__}
     bromixbmc.addVideoLink(bromixbmc.Addon.localize(30005), params = params, thumbnailImage=__ICON_LIVE__, fanart=__FANART__)
-    
-    if len(bromixbmc.Addon.getFavorites())>0:
-        params = {'action': __ACTION_SHOW_FAVS__}
-        bromixbmc.addDir("[B]"+bromixbmc.Addon.localize(30008)+"[/B]", params = params, thumbnailImage=__ICON_FAVOURITES__, fanart=__FANART__)
     
     xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle)
     return True
