@@ -199,7 +199,7 @@ class Client:
         videoUrl = film.get('videourl', None)
         if videoUrl!=None:
             """
-            This is part an implementation of rtl_now provieded by AddonScriptorDE
+            This is part an implementation of rtl_now provided by AddonScriptorDE
             """
             opener = urllib2.build_opener()
             userAgent = "Mozilla/5.0 (Windows NT 5.1; rv:24.0) Gecko/20100101 Firefox/24.0"
