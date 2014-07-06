@@ -91,6 +91,7 @@ def showLibrary():
                 fanart = fanart.replace('/640x360/', '/768x432/')
                 
             thumbnailImage = show.get('biggalerieimg', '')
+            thumbnailImage = thumbnailImage.replace('/271x152/', '/768x432/')
             
             if free_episodes>=1 and title!=None and id!=None:
                 params = {'action': __ACTION_SHOW_EPISODES__,
