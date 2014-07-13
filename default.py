@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import xbmcplugin
-import xbmcgui
-import xbmcaddon
+import xbmc
 
 import os
 import re
@@ -10,20 +8,19 @@ import re
 #import pydevd
 #pydevd.settrace('localhost', stdoutToServer=True, stderrToServer=True)
 
-from bromixbmc import Bromixbmc
-bromixbmc = Bromixbmc("plugin.video.vox_now", sys.argv)
+import bromixbmc
+__plugin__ = bromixbmc.Plugin()
 
 import rtlinteractive
-
 __now_client__ = rtlinteractive.now.Client(rtlinteractive.now.__CONFIG_VOX_NOW__)
 
-__FANART__ = os.path.join(bromixbmc.Addon.Path, "fanart.jpg")
-__ICON_FAVOURITES__ = os.path.join(bromixbmc.Addon.Path, "resources/media/favorites.png")
-__ICON_NEWEST__ = os.path.join(bromixbmc.Addon.Path, "resources/media/newest.png")
-__ICON_HIGHLIGHTS__ = os.path.join(bromixbmc.Addon.Path, "resources/media/highlight.png")
-__ICON_LIBRARY__ = os.path.join(bromixbmc.Addon.Path, "resources/media/library.png")
-__ICON_SEARCH__ = os.path.join(bromixbmc.Addon.Path, "resources/media/search.png")
-__ICON_LIVE__ = os.path.join(bromixbmc.Addon.Path, "resources/media/livestream.png")
+__FANART__ = os.path.join(__plugin__.getPath(), "fanart.jpg")
+__ICON_FAVOURITES__ = os.path.join(__plugin__.getPath(), "resources/media/favorites.png")
+__ICON_NEWEST__ = os.path.join(__plugin__.getPath(), "resources/media/newest.png")
+__ICON_HIGHLIGHTS__ = os.path.join(__plugin__.getPath(), "resources/media/highlight.png")
+__ICON_LIBRARY__ = os.path.join(__plugin__.getPath(), "resources/media/library.png")
+__ICON_SEARCH__ = os.path.join(__plugin__.getPath(), "resources/media/search.png")
+__ICON_LIVE__ = os.path.join(__plugin__.getPath(), "resources/media/livestream.png")
 
 __ACTION_SHOW_LIBRARY__ = 'showLibrary'
 __ACTION_SHOW_TIPS__ = 'showTips'
@@ -37,35 +34,34 @@ __ACTION_ADD_FAV__ = 'addFav'
 __ACTION_REMOVE_FAV__ = 'removeFav'
 __ACTION_PLAY__ = 'play'
 
-__SETTING_SHOW_FANART__ = bromixbmc.Addon.getSetting('showFanart')=="true"
-__SETTING_SHOW_PUCLICATION_DATE__ = bromixbmc.Addon.getSetting('showPublicationDate')=="true"
+__SETTING_SHOW_FANART__ = __plugin__.getSettingAsBool('showFanart')
+__SETTING_SHOW_PUCLICATION_DATE__ = __plugin__.getSettingAsBool('showPublicationDate')
 
 def showIndex():
-    if len(bromixbmc.Addon.getFavorites())>0:
+    if len(__plugin__.getFavorites())>0:
         params = {'action': __ACTION_SHOW_FAVS__}
-        bromixbmc.addDir("[B]"+bromixbmc.Addon.localize(30008)+"[/B]", params = params, thumbnailImage=__ICON_FAVOURITES__, fanart=__FANART__)
+        __plugin__.addDirectory("[B]"+__plugin__.localize(30008)+"[/B]", params = params, thumbnailImage=__ICON_FAVOURITES__, fanart=__FANART__)
         
     # add 'Sendungen A-Z'
     params = {'action': __ACTION_SHOW_LIBRARY__}
-    bromixbmc.addDir(bromixbmc.Addon.localize(30000), params = params, thumbnailImage=__ICON_LIBRARY__, fanart=__FANART__)
+    __plugin__.addDirectory(__plugin__.localize(30000), params = params, thumbnailImage=__ICON_LIBRARY__, fanart=__FANART__)
     
     params = {'action': __ACTION_SHOW_NEWEST__}
-    bromixbmc.addDir(bromixbmc.Addon.localize(30002), params = params, thumbnailImage=__ICON_NEWEST__, fanart=__FANART__)
+    __plugin__.addDirectory(__plugin__.localize(30002), params = params, thumbnailImage=__ICON_NEWEST__, fanart=__FANART__)
     
     params = {'action': __ACTION_SHOW_TIPS__}
-    bromixbmc.addDir(bromixbmc.Addon.localize(30001), params = params, thumbnailImage=__ICON_HIGHLIGHTS__, fanart=__FANART__)
+    __plugin__.addDirectory(__plugin__.localize(30001), params = params, thumbnailImage=__ICON_HIGHLIGHTS__, fanart=__FANART__)
     
     params = {'action': __ACTION_SHOW_TOP10__}
-    bromixbmc.addDir(bromixbmc.Addon.localize(30003), params = params, thumbnailImage=__ICON_HIGHLIGHTS__, fanart=__FANART__)
+    __plugin__.addDirectory(__plugin__.localize(30003), params = params, thumbnailImage=__ICON_HIGHLIGHTS__, fanart=__FANART__)
     
     params = {'action': __ACTION_SEARCH__}
-    bromixbmc.addDir(bromixbmc.Addon.localize(30004), params = params, thumbnailImage=__ICON_SEARCH__, fanart=__FANART__)
+    __plugin__.addDirectory(__plugin__.localize(30004), params = params, thumbnailImage=__ICON_SEARCH__, fanart=__FANART__)
     
     params = {'action': __ACTION_LIVE_STREAM__}
-    bromixbmc.addVideoLink(bromixbmc.Addon.localize(30005), params = params, thumbnailImage=__ICON_LIVE__, fanart=__FANART__)
+    __plugin__.addVideoLink(__plugin__.localize(30005), params = params, thumbnailImage=__ICON_LIVE__, fanart=__FANART__)
     
-    xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle)
-    return True
+    __plugin__.endOfDirectory()
 
 def showLibrary():
     def _sort_key(d):
@@ -100,16 +96,15 @@ def showLibrary():
                                  'title': title.encode('utf-8'),
                                  'fanart': fanart,
                                  'thumb': thumbnailImage}
-                contextRun = 'RunPlugin('+bromixbmc.createUrl(contextParams)+')'
-                contextMenu = [("[B]"+bromixbmc.Addon.localize(30006)+"[/B]", contextRun)]
+                contextRun = 'RunPlugin('+__plugin__.createUrl(contextParams)+')'
+                contextMenu = [("[B]"+__plugin__.localize(30006)+"[/B]", contextRun)]
                 
-                bromixbmc.addDir(title, params=params, thumbnailImage=thumbnailImage, fanart=fanart, contextMenu=contextMenu)
+                __plugin__.addDirectory(title, params=params, thumbnailImage=thumbnailImage, fanart=fanart, contextMenu=contextMenu)
     
-    xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle)
-    return True
+    __plugin__.endOfDirectory()
 
 def _listEpisodes(episodes, format_id, func={}, break_at_none_free_episode=True):
-    xbmcplugin.setContent(bromixbmc.Addon.Handle, 'episodes')
+    __plugin__.setContent('episodes')
     
     episodes = episodes.get('content', {})
     page = episodes.get('page', '1')
@@ -153,17 +148,18 @@ def _listEpisodes(episodes, format_id, func={}, break_at_none_free_episode=True)
                 
             thumbnailImage = __now_client__.getEpisodeThumbnailImage(episode)
 
-            additionalInfoLabels = {'duration': duration,
-                                    'plot': episode.get('articleshort', ''),
-                                    'episode': episode.get('episode', ''),
-                                    'season': episode.get('season', ''),
-                                    'year': year,
-                                    'aired': aired}
+            infoLabels = {'duration': duration,
+                          'plot': episode.get('articleshort', ''),
+                          'episode': episode.get('episode', ''),
+                          'season': episode.get('season', ''),
+                          'year': year,
+                          'aired': aired
+                          }
                 
             if free=='1' and title!=None and id!=None:
                 params = {'action': __ACTION_PLAY__,
                           'id': id}
-                bromixbmc.addVideoLink(title, params=params, thumbnailImage=thumbnailImage, fanart=fanart, additionalInfoLabels=additionalInfoLabels)
+                __plugin__.addVideoLink(title, params=params, thumbnailImage=thumbnailImage, fanart=fanart, infoLabels=infoLabels)
                 show_next = True
             elif free=='0':
                 show_next = False
@@ -173,10 +169,10 @@ def _listEpisodes(episodes, format_id, func={}, break_at_none_free_episode=True)
                   'id': format_id,
                   'page': str(page+1)
                   }
-        bromixbmc.addDir(bromixbmc.Addon.localize(30009)+' ('+str(page+1)+')', params=params, fanart=__FANART__)
+        __plugin__.addDirectory(__plugin__.localize(30009)+' ('+str(page+1)+')', params=params, fanart=__FANART__)
         pass
-    xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle)
-    return True
+    
+    __plugin__.endOfDirectory()
 
 def showTips():
     def _sort_key(d):
@@ -234,9 +230,9 @@ def showEpisodes(id):
     
 def search():
     success = False
-    keyboard = xbmc.Keyboard('', bromixbmc.Addon.localize(30004))
-    keyboard.doModal()
-    if keyboard.isConfirmed() and keyboard.getText():
+    
+    keyboard = bromixbmc.Keyboard(__plugin__.localize(30004))
+    if keyboard.doModal():
         success = True
         
         search_string = keyboard.getText().replace(" ", "+")
@@ -251,31 +247,28 @@ def search():
                 if title!=None and id!=None:
                     params = {'action': __ACTION_SHOW_EPISODES__,
                               'id': id}
-                    bromixbmc.addDir(title, params=params)
+                    __plugin__.addDirectory(title, params=params)
         
-    xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle, succeeded=success)
-    return True
+    __plugin__.endOfDirectory(success)
 
 def playLivestream():
     streams = __now_client__.getLivestreams()
     
-    lsq = bromixbmc.Addon.getSetting('liveStreamQuality')
+    lsq = __plugin__.getSettingAsInt('liveStreamQuality')
     key = 'high_android4'
-    if lsq=='1':
+    if lsq==1:
         key='high_android4'
-    elif lsq=='0':
+    elif lsq==0:
         key='high_android2'
     else:
         key='high_android4'
     
     url = streams.get(key, None)
     if url!=None:
-        listitem = xbmcgui.ListItem(path=url)
-        xbmcplugin.setResolvedUrl(bromixbmc.Addon.Handle, True, listitem) 
-    pass
+        __plugin__.setResolvedUrl(url, isLiveStream=True)
 
 def removeFav(id):
-    bromixbmc.Addon.removeFavorite(id)
+    __plugin__.removeFavorite(id)
     xbmc.executebuiltin("Container.Refresh");
     pass
 
@@ -290,14 +283,14 @@ def addFav(id):
         newFav['fanart'] = fanart
         newFav['thumbnailImage'] = thumbnailImage
         
-        bromixbmc.Addon.addFavorite(id, newFav)
+        __plugin__.setFavorite(id, newFav)
     pass
 
 def showFavs():
     def _sort_key(d):
         return d[1].get('title', "")
     
-    _favs = bromixbmc.Addon.getFavorites()
+    _favs = __plugin__.getFavorites()
     favs = sorted(_favs, key=_sort_key, reverse=False)
     
     for fav in favs:
@@ -310,20 +303,17 @@ def showFavs():
                 contextParams = {'action': __ACTION_REMOVE_FAV__,
                                  'id': fav[0]
                                  }
-                contextRun = 'RunPlugin('+bromixbmc.createUrl(contextParams)+')'
-                contextMenu = [("[B]"+bromixbmc.Addon.localize(30007)+"[/B]", contextRun)]
+                contextRun = 'RunPlugin('+__plugin__.createUrl(contextParams)+')'
+                contextMenu = [("[B]"+__plugin__.localize(30007)+"[/B]", contextRun)]
                 
-                bromixbmc.addDir(title, params=params, thumbnailImage=item.get('thumbnailImage', ''), fanart=item.get('fanart', ''), contextMenu=contextMenu)
+                __plugin__.addDirectory(title, params=params, thumbnailImage=item.get('thumbnailImage', ''), fanart=item.get('fanart', ''), contextMenu=contextMenu)
                 
-    xbmcplugin.endOfDirectory(bromixbmc.Addon.Handle)
-    return True
+    __plugin__.endOfDirectory()
 
 def play(id):
     url = __now_client__.getEpisodeVideoUrl(id)
     if url!=None:
-        listitem = xbmcgui.ListItem(path=url)
-        xbmcplugin.setResolvedUrl(bromixbmc.Addon.Handle, True, listitem) 
-    pass
+        __plugin__.setResolvedUrl(url) 
 
 action = bromixbmc.getParam('action')
 id = bromixbmc.getParam('id')
