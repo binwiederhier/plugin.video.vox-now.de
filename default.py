@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import xbmc
-
 import os
 import re
 
@@ -64,42 +62,37 @@ def showIndex():
     __plugin__.endOfDirectory()
 
 def showLibrary():
-    def _sort_key(d):
-        return d[1].get('formatlong', '').lower()
-     
+    __plugin__.addSortMethod()
+    
     shows = __now_client__.getShows()
     shows = shows.get('content', {})
     shows = shows.get('formatlist', {})
     
-    sorted_shows = sorted(shows.items(), key=_sort_key, reverse=False)
-    
-    for item in sorted_shows:
-        if len(item)>=2:
-            show = item[1]
-            title = show.get('formatlong', None)
-            id = show.get('formatid', None)
-            free_episodes = int(show.get('free_episodes', '0'))
-            fanart = None
-            if __SETTING_SHOW_FANART__:
-                fanart = show.get('bigaufmacherimg', '')
-                fanart = fanart.replace('/640x360/', '/768x432/')
-                
-            thumbnailImage = show.get('biggalerieimg', '')
-            thumbnailImage = thumbnailImage.replace('/271x152/', '/768x432/')
+    for key, show in shows.items():
+        title = show.get('formatlong', None)
+        id = show.get('formatid', None)
+        free_episodes = int(show.get('free_episodes', '0'))
+        fanart = None
+        if __SETTING_SHOW_FANART__:
+            fanart = show.get('bigaufmacherimg', '')
+            fanart = fanart.replace('/640x360/', '/768x432/')
             
-            if free_episodes>=1 and title!=None and id!=None:
-                params = {'action': __ACTION_SHOW_EPISODES__,
-                          'id': id}
-                
-                contextParams = {'action': __ACTION_ADD_FAV__,
-                                 'id': id,
-                                 'title': title.encode('utf-8'),
-                                 'fanart': fanart,
-                                 'thumb': thumbnailImage}
-                contextRun = 'RunPlugin('+__plugin__.createUrl(contextParams)+')'
-                contextMenu = [("[B]"+__plugin__.localize(30006)+"[/B]", contextRun)]
-                
-                __plugin__.addDirectory(title, params=params, thumbnailImage=thumbnailImage, fanart=fanart, contextMenu=contextMenu)
+        thumbnailImage = show.get('biggalerieimg', '')
+        thumbnailImage = thumbnailImage.replace('/271x152/', '/768x432/')
+        
+        if free_episodes>=1 and title!=None and id!=None:
+            params = {'action': __ACTION_SHOW_EPISODES__,
+                      'id': id}
+            
+            contextParams = {'action': __ACTION_ADD_FAV__,
+                             'id': id,
+                             'title': title.encode('utf-8'),
+                             'fanart': fanart,
+                             'thumb': thumbnailImage}
+            contextRun = 'RunPlugin('+__plugin__.createUrl(contextParams)+')'
+            contextMenu = [("[B]"+__plugin__.localize(30006)+"[/B]", contextRun)]
+            
+            __plugin__.addDirectory(title, params=params, thumbnailImage=thumbnailImage, fanart=fanart, contextMenu=contextMenu)
     
     __plugin__.endOfDirectory()
 
@@ -129,16 +122,14 @@ def _listEpisodes(episodes, format_id, func={}, break_at_none_free_episode=True)
 
             year = ''
             aired = ''
+            date = ''
             match = re.compile('(\d*)\-(\d*)\-(\d*) (\d*)\:(\d*)\:(\d*)', re.DOTALL).findall(episode.get('sendestart', '0000-00-00'))
             if match!=None and len(match[0])>=3:
                 year = match[0][0]
                 aired = match[0][0]+"-"+match[0][1]+"-"+match[0][2]
+                date = match[0][2]+"."+match[0][1]+"."+match[0][0]
                 if __SETTING_SHOW_PUCLICATION_DATE__:
-                    date_format = xbmc.getRegion('dateshort')
-                    
-                    date_format = date_format.replace('%d', match[0][0])
-                    date_format = date_format.replace('%m', match[0][1])
-                    date_format = date_format.replace('%Y', match[0][2])
+                    date_format = bromixbmc.getFormatDateShort(match[0][0], match[0][1], match[0][2])
                     title = date_format+" - "+title
                 
             fanart = None
@@ -153,6 +144,7 @@ def _listEpisodes(episodes, format_id, func={}, break_at_none_free_episode=True)
                           'episode': episode.get('episode', ''),
                           'season': episode.get('season', ''),
                           'year': year,
+                          'date': date,
                           'aired': aired
                           }
                 
@@ -170,7 +162,6 @@ def _listEpisodes(episodes, format_id, func={}, break_at_none_free_episode=True)
                   'page': str(page+1)
                   }
         __plugin__.addDirectory(__plugin__.localize(30009)+' ('+str(page+1)+')', params=params, fanart=__FANART__)
-        pass
     
     __plugin__.endOfDirectory()
 
@@ -269,7 +260,7 @@ def playLivestream():
 
 def removeFav(id):
     __plugin__.removeFavorite(id)
-    xbmc.executebuiltin("Container.Refresh");
+    bromixbmc.executebuiltin("Container.Refresh");
     pass
 
 def addFav(id):
