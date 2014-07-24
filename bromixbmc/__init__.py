@@ -1,4 +1,10 @@
 """
+Version 2.0.7 (2014.07.25)
+- ADD: addImage(...) will also set the setInfo('pictures'...) info labels
+
+Version 2.0.6 (2014.07.20)
+- ADD: addImage(...)
+
 Version 2.0.5 (2014.07.19)
 - ADD: executebuiltin(function)
 - ADD: addSortMethod(sort_method) for add sorting

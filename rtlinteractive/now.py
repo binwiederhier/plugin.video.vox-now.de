@@ -24,7 +24,7 @@ __CONFIG_RTL_NOW__ = {'salt_phone': 'ba647945-6989-477b-9767-870790fcf552',
                       'http-header': {'X-App-Name': 'RTL NOW App',
                                       'X-Device-Type': 'rtlnow_android',
                                       'X-App-Version': '1.3.1',
-                                      'X-Device-Checksum': 'ed0226e4e613e4cd81c6257bced1cb1b',
+                                      #'X-Device-Checksum': 'ed0226e4e613e4cd81c6257bced1cb1b',
                                       'Host': 'rtl-now.rtl.de',
                                       'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.2; GT-I9505 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Mobile Safari/537.36'
                                       }
@@ -40,7 +40,7 @@ __CONFIG_RTL2_NOW__ = {'salt_phone': '9be405a6-2d5c-4e62-8ba0-ba2b5f11072d',
                       'http-header': {'X-App-Name': 'RTL II NOW App',
                                       'X-Device-Type': 'rtl2now_android',
                                       'X-App-Version': '1.3.1',
-                                      'X-Device-Checksum': 'ed0226e4e613e4cd81c6257bced1cb1b',
+                                      #'X-Device-Checksum': 'ed0226e4e613e4cd81c6257bced1cb1b',
                                       'Host': 'rtl2now.rtl2.de',
                                       'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.2; GT-I9505 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Mobile Safari/537.36'
                                       }
@@ -56,7 +56,7 @@ __CONFIG_VOX_NOW__ = {'salt_phone': '9fb130b5-447e-4bbc-a44a-406f2d10d963',
                       'http-header': {'X-App-Name': 'VOX NOW App',
                                       'X-Device-Type': 'voxnow_android',
                                       'X-App-Version': '1.3.1',
-                                      'X-Device-Checksum': 'a5fabf8ef3f4425c0b8ff716562dd1a3',
+                                      #'X-Device-Checksum': 'a5fabf8ef3f4425c0b8ff716562dd1a3',
                                       'Host': 'www.voxnow.de',
                                       'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.2; GT-I9505 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Mobile Safari/537.36'
                                       }

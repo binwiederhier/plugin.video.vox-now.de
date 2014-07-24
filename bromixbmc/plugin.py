@@ -115,6 +115,18 @@ class Plugin(object):
             
         return xbmcplugin.addDirectoryItem(handle=self._addon_handle,url=url,listitem=item,isFolder=True)
     
+    def addImage(self, name, image_url, fanart='', contextMenu=None):
+        item = xbmcgui.ListItem(name, thumbnailImage=image_url)
+        if fanart and len(fanart)>0:
+            item.setProperty("fanart_image", fanart)
+            
+        if contextMenu!=None:
+            item.addContextMenuItems(contextMenu);
+            
+        item.setInfo(type="pictures", infoLabels={'title': name})
+            
+        return xbmcplugin.addDirectoryItem(handle=self._addon_handle,url=image_url,listitem=item)
+    
     def addVideoLink(self, name, params={}, thumbnailImage='', fanart='', infoLabels={}):
         url = self.createUrl(params)
         
