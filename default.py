@@ -56,8 +56,12 @@ def showIndex():
     params = {'action': __ACTION_SEARCH__}
     __plugin__.addDirectory(__plugin__.localize(30004), params = params, thumbnailImage=__ICON_SEARCH__, fanart=__FANART__)
     
+    """
+    The live stream is not working at the moment - so we deactivate the live stream for the moment
+    
     params = {'action': __ACTION_LIVE_STREAM__}
     __plugin__.addVideoLink(__plugin__.localize(30005), params = params, thumbnailImage=__ICON_LIVE__, fanart=__FANART__)
+    """
     
     __plugin__.endOfDirectory()
 
