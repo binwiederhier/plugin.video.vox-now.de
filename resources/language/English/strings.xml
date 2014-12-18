@@ -1,23 +1,39 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <strings>
-	<!-- Global strings -->
-	<string id="30000">Shows (A-Z)</string>
-	<string id="30001">Tips</string>
-	<string id="30002">Newest</string>
-	<string id="30003">Top 10</string>
-	<string id="30004">Search</string>
-	<string id="30005">Live stream</string>
-	
-	<string id="30006">Add to addon favs</string>
-	<string id="30007">Remove</string>
-	<string id="30008">Favorites</string>
-	
-	<string id="30009">Next Page</string>
+    <!-- Kodion Settings -->
+    <string id="30000">General</string>
+    <string id="30001">Username</string>
+    <string id="30002">Password</string>
 
-	<!-- Settings -->
-	<string id="30500">Show fanart</string>
-	<string id="30501">Show publication date in title</string>
-	<string id="30502">Quality of live stream</string>
-	<string id="30503">Medium</string>
-	<string id="30504">High</string>
+    <string id="30010">Video Quality</string>
+    <string id="30011">SD</string>
+	<string id="30012">HD</string>
+	<string id="30013">Full HD</string>
+    <string id="30014">Ultra HD</string>
+    <string id="30020">Allow 3D</string>
+    <string id="30021">Show Fanart</string>
+    <string id="30022">Items per page</string>
+    <string id="30023">Search History Size</string>
+    <string id="30024">Cache Size (MB)</string>
+
+    <!-- Kodion Common -->
+    <string id="30100">Favorites</string>
+    <string id="30101">Add to addon favs</string>
+    <string id="30102">Search</string>
+    <string id="30103">Library</string>
+    <string id="30104">Highlights</string>
+    <string id="30105">Archive</string>
+    <string id="30106">Next Page (%d)</string>
+    <string id="30107">Watch Later</string>
+    <string id="30108">Remove</string>
+    <string id="30109">Latest Videos</string>
+    <string id="30110">New Search</string>
+    <string id="30111">Sign In</string>
+    <string id="30112">Sign Out</string>
+
+    <!-- NOW -->
+    <string id="30500">Shows (A-Z)</string>
+    <string id="30501">Newest</string>
+    <string id="30502">Tips</string>
+    <string id="30503">Top 10</string>
 </strings>
