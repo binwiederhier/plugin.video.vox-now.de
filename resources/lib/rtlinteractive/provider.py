@@ -25,8 +25,7 @@ class Provider(kodion.AbstractProvider):
     def get_client(self, context):
         if not self._client:
             amount = context.get_settings().get_items_per_page()
-            server_id = context.get_function_cache().get(FunctionCache.ONE_HOUR * 6, Client.get_server_id)
-            self._client = Client(Client.CONFIG_VOX_NOW, amount=amount, server_id=server_id)
+            self._client = Client(Client.CONFIG_VOX_NOW, amount=amount)
             pass
 
         return self._client
@@ -127,7 +126,8 @@ class Provider(kodion.AbstractProvider):
     def _on_play(self, context, re_match):
         video_id = context.get_param('video_id', '')
         if video_id:
-            streams = self.get_client(context).get_film_streams(video_id)
+            server_id = context.get_function_cache().get(FunctionCache.ONE_HOUR * 6, Client.get_server_id)
+            streams = self.get_client(context).get_film_streams(video_id, server_id=server_id)
             video_item = VideoItem(video_id,
                                    streams[0])
             return video_item

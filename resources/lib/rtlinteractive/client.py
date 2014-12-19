@@ -65,10 +65,9 @@ class Client(object):
                                       'Host': 'www.voxnow.de',
                                       'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.2; GT-I9505 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Mobile Safari/537.36'}}
 
-    def __init__(self, config, amount=25, server_id=26):
+    def __init__(self, config, amount=25):
         self._config = config
         self._amount = amount
-        self._server_id = server_id
         pass
 
     @staticmethod
@@ -79,13 +78,25 @@ class Client(object):
         :return:
         """
         rtl_client = Client(Client.CONFIG_RTL_NOW)
-        streams = rtl_client.get_film_streams(183331)
-        if streams:
-            stream = streams[0]
-            re_match = re.search(r'rtmpe://fms-fra(?P<server_id>\d+).*', stream)
-            if re_match:
-                server_id = int(re_match.group('server_id'))
-                return server_id
+        json_data = rtl_client.get_films(33)
+        film_list = json_data.get('result', {}).get('content', {}).get('filmlist', {})
+        film_id = None
+        for key in film_list:
+            film = film_list[key]
+            if int(film.get('free', 1)) == 1:
+                film_id = film['id']
+                break
+            pass
+
+        if film_id is not None:
+            streams = rtl_client.get_film_streams(film_id)
+            if streams:
+                stream = streams[0]
+                re_match = re.search(r'rtmpe://fms-fra(?P<server_id>\d+).*', stream)
+                if re_match:
+                    server_id = int(re_match.group('server_id'))
+                    return server_id
+                pass
             pass
 
         return 22
@@ -93,7 +104,7 @@ class Client(object):
     def get_config(self):
         return self._config
 
-    def get_film_streams(self, film_id):
+    def get_film_streams(self, film_id, server_id=22):
         result = []
 
         def _browse(_url):
@@ -126,7 +137,7 @@ class Client(object):
         if video_url:
             video_data = _get_data_from_html(video_url)
             player_data = video_data['playerdata']
-            player_url = video_data['playerurl']
+            player_url = video_data['playerurl'].replace('.liveab.swf', '.swf')
 
             xml = _get_xml(player_data)
             video_info = xml.find('./playlist/videoinfo')
@@ -141,7 +152,7 @@ class Client(object):
                     pass
                 elif hds_match:
                     play_path = hds_match.group('play_path').replace('.f4m', '')
-                    rtmpe = self._config['rtmpe'] % self._server_id
+                    rtmpe = self._config['rtmpe'] % server_id
                     url = '%s%s playpath=%s swfVfy=1 swfUrl=%s pageUrl=%s' % (rtmpe, play_path, 'mp4:'+play_path, player_url, video_url)
                     result.append(url)
                     pass
