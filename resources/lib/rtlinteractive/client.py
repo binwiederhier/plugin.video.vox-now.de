@@ -116,30 +116,50 @@ class Client(object):
                        'Accept-Encoding': 'gzip, deflate, sdch',
                        'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
 
-            result = requests.get(_url, headers=headers, verify=False)
-            return result.text
+            _result = requests.get(_url, headers=headers, verify=False)
+            return _result.text
 
         def _get_xml(_xml_url):
-            xml = _browse(_xml_url)
-            return ElementTree.fromstring(xml.encode('utf-8'))
+            _xml = _browse(_xml_url)
+            return ElementTree.fromstring(_xml.encode('utf-8'))
 
         def _get_data_from_html(_video_url):
             html = _browse(_video_url)
-            re_match = re.search(r'PlayerWatchdog.init\((?P<data>[^\)]+)', html)
-            if re_match:
-                video_data = re_match.group('data').replace('\'', '"')
-                return json.loads(video_data)
-            return {}
+            pos = html.find('PlayerWatchdog.ini')
+            if pos:
+                html = html[pos:]
+                pos = html.find('PlayerWatchdog.setTimer')
+                if pos:
+                    html = html[:pos]
+                    pass
+                pass
+
+            player_data_url = re.search(r"'playerdata': '(?P<playerdata_url>[^']+)'", html)
+            if player_data_url:
+                player_data_url = player_data_url.group('playerdata_url')
+                pass
+            else:
+                player_data_url = None
+                pass
+
+            player_url = re.search(r"'playerurl': '(?P<player_url>[^']+)'", html)
+            if player_url:
+                player_url = player_url.group('player_url')
+                pass
+            else:
+                player_url = None
+                pass
+
+            return player_data_url, player_url
 
         json_data = self.get_film_details(film_id)
         film = json_data.get('result', {}).get('content', {}).get('film', {})
         video_url = str(film.get('videourl', ''))
         if video_url:
-            video_data = _get_data_from_html(video_url)
-            player_data = video_data['playerdata']
-            player_url = video_data['playerurl'].replace('.liveab.swf', '.swf')
+            player_data_url, player_url = _get_data_from_html(video_url)
+            player_url = player_url.replace('.liveab.swf', '.swf')
 
-            xml = _get_xml(player_data)
+            xml = _get_xml(player_data_url)
             video_info = xml.find('./playlist/videoinfo')
             for filename in video_info.findall('filename'):
                 rtmpe_match = re.search(r'(?P<url>rtmpe://(?:[^/]+/){2})(?P<play_path>.+)', filename.text)
