@@ -73,12 +73,12 @@ class Client(object):
     @staticmethod
     def get_server_id():
         """
-        For HDS streams we need a valid server id ('fms-fraXX'). We use the show 'RTL Aktuell' of rtlnow.de for all
+        For HDS streams we need a valid server id ('fms-fraXX'). We use the show 'RTL Nachtjournal' of rtlnow.de for all
         other NOW services (because the use all the same server).
         :return:
         """
         rtl_client = Client(Client.CONFIG_RTL_NOW)
-        json_data = rtl_client.get_films(33)
+        json_data = rtl_client.get_films(290)
         film_list = json_data.get('result', {}).get('content', {}).get('filmlist', {})
         film_id = None
         for key in film_list:
