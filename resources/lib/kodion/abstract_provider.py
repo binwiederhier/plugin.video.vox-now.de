@@ -48,6 +48,12 @@ class AbstractProvider(object):
         self._dict_path[re_path] = method_name
 
     def navigate(self, context):
+        # start the setup wizard
+        if context.get_settings().is_setup_wizard():
+            context.get_settings().set_bool(constants.setting.SETUP_WIZARD, False)
+            self.on_setup_wizard(context)
+            pass
+
         path = context.get_path()
 
         for key in self._dict_path:
@@ -89,6 +95,11 @@ class AbstractProvider(object):
         :param re_match:
         :return:
         """
+        raise NotImplementedError()
+
+    def on_setup_wizard(self, context):
+        # TODO: start view mode settings
+        #call super(<YOUR-CALL-NAME>, self).on_setup_wizard()
         raise NotImplementedError()
 
     def on_root(self, context, re_match):
@@ -235,8 +246,7 @@ class AbstractProvider(object):
             result = []
 
             # 'New Search...'
-            new_search_item = items.create_new_search_item(context)
-            new_search_item.set_fanart(self.get_alternative_fanart(context))
+            new_search_item = items.NewSearchItem(context, fanart=self.get_alternative_fanart(context))
             result.append(new_search_item)
 
             for search in search_history.list():
@@ -246,8 +256,8 @@ class AbstractProvider(object):
                     pass
 
                 # we create a new instance of the SearchItem
-                search_history_item = items.create_search_history_item(context, search)
-                search_history_item.set_fanart(self.get_alternative_fanart(context))
+                search_history_item = items.SearchHistoryItem(context, search,
+                                                              fanart=self.get_alternative_fanart(context))
                 result.append(search_history_item)
                 pass
             return result, {self.RESULT_CACHE_TO_DISC: False}

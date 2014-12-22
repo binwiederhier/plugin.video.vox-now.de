@@ -70,7 +70,7 @@ class Provider(kodion.AbstractProvider):
 
             # set image
             image = film['biggalerieimg']
-            image = re.sub(r'(.*/)(\d+)x(\d+)(/.*)', r'\g<1>500x281\g<4>', image)
+            image = re.sub(r'(.+/)(\d+)x(\d+)(/.+)', r'\g<1>500x281\g<4>', image)
             pictures = film.get('pictures', [])
             if pictures and isinstance(pictures, dict):
                 image = film['pictures']['pic_0']
@@ -80,7 +80,7 @@ class Provider(kodion.AbstractProvider):
 
             # set fanart
             fanart = film['bigaufmacherimg']
-            fanart = re.sub(r'(.*/)(\d+)x(\d+)(/.*)', r'\g<1>768x432\g<4>', fanart)
+            fanart = re.sub(r'(.+/)(\d+)x(\d+)(/.+)', r'\g<1>768x432\g<4>', fanart)
             film_item.set_fanart(fanart)
 
             # season and episode
@@ -115,8 +115,7 @@ class Provider(kodion.AbstractProvider):
             new_params = {}
             new_params.update(context.get_params())
             new_params['page'] = page + 1
-            next_page_item = kodion.items.create_next_page_item(context, page)
-            next_page_item.set_fanart(self.get_fanart(context))
+            next_page_item = kodion.items.NextPageItem(context, current_page=page, fanart=self.get_fanart(context))
             result.append(next_page_item)
             pass
 
@@ -187,12 +186,12 @@ class Provider(kodion.AbstractProvider):
 
                 # set image
                 image = now_format['biggalerieimg']
-                image = re.sub(r'(.*/)(\d+)x(\d+)(/.*)', r'\g<1>500x281\g<4>', image)
+                image = re.sub(r'(.+/)(\d+)x(\d+)(/.+)', r'\g<1>500x281\g<4>', image)
                 format_item.set_image(image)
 
                 # set fanart
                 fanart = now_format['bigaufmacherimg']
-                fanart = re.sub(r'(.*/)(\d+)x(\d+)(/.*)', r'\g<1>768x432\g<4>', fanart)
+                fanart = re.sub(r'(.+/)(\d+)x(\d+)(/.+)', r'\g<1>768x432\g<4>', fanart)
                 format_item.set_fanart(fanart)
 
                 context_menu = [(context.localize(self.LOCAL_MAP['now.add_to_favs']),
@@ -227,15 +226,13 @@ class Provider(kodion.AbstractProvider):
 
         # favorites
         if len(context.get_favorite_list().list()) > 0:
-            fav_item = kodion.items.create_favorite_item(context)
-            fav_item.set_fanart(self.get_fanart(context))
+            fav_item = kodion.items.FavoritesItem(context, fanart=self.get_fanart(context))
             result.append(fav_item)
             pass
 
         # watch later
         if len(context.get_watch_later_list().list()) > 0:
-            watch_later_item = kodion.items.create_watch_later_item(context)
-            watch_later_item.set_fanart(self.get_fanart(context))
+            watch_later_item = kodion.items.WatchLaterItem(context, fanart=self.get_fanart(context))
             result.append(watch_later_item)
             pass
 
@@ -268,8 +265,7 @@ class Provider(kodion.AbstractProvider):
         result.append(top10_item)
 
         # search
-        search_item = kodion.items.create_search_item(context)
-        search_item.set_fanart(self.get_fanart(context))
+        search_item = kodion.items.SearchItem(context, fanart=self.get_fanart(context))
         result.append(search_item)
 
         return result

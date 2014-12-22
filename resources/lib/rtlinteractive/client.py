@@ -298,7 +298,8 @@ class Client(object):
         if result is None:
             return {}
 
-        return result.json()
-
+        # tests showed that json.loads was 2 times faster then result.json of requests
+        return json.loads(result.text)
+        #return result.json()
 
     pass
