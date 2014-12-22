@@ -49,9 +49,12 @@ class AbstractProvider(object):
 
     def navigate(self, context):
         # start the setup wizard
-        if context.get_settings().is_setup_wizard():
+        if context.get_settings().is_setup_wizard_enabled():
+            if context.get_ui().on_yes_no_input(context.localize(constants.localize.SETUP_WIZARD_EXECUTE),
+                                                context.localize(constants.localize.SETUP_WIZARD_LABEL)):
+                self.on_setup_wizard(context)
+                pass
             context.get_settings().set_bool(constants.setting.SETUP_WIZARD, False)
-            self.on_setup_wizard(context)
             pass
 
         path = context.get_path()
@@ -98,9 +101,22 @@ class AbstractProvider(object):
         raise NotImplementedError()
 
     def on_setup_wizard(self, context):
-        # TODO: start view mode settings
-        #call super(<YOUR-CALL-NAME>, self).on_setup_wizard()
-        raise NotImplementedError()
+        _settings = context.get_settings()
+
+        def _setup_views():
+            import utils
+            view_manager = utils.ViewManager(context)
+            if not view_manager.update_view_mode(context.localize(constants.localize.SETUP_VIEW_DEFAULT), 'default'):
+                return
+
+            if not view_manager.update_view_mode(context.localize(constants.localize.SETUP_VIEW_VIDEOS), 'videos'):
+                return
+
+            _settings.set_bool(constants.setting.VIEW_OVERRIDE, True)
+            pass
+
+        _setup_views()
+        pass
 
     def on_root(self, context, re_match):
         """

@@ -15,6 +15,12 @@
     <string id="30022">Einträge pro Seite</string>
     <string id="30023">Größe der Suchhistorie</string>
     <string id="30024">Cache-Größe (MB)</string>
+    <string id="30025">Setup-Assistenten aktivieren</string>
+    <string id="30026">Ansicht überschreiben</string>
+    <string id="30027">Ansicht: Default</string>
+    <string id="30028">Ansicht: Videos</string>
+    <string id="30029">Ausführen</string>
+    <string id="30030">Setup-Assistenten</string>
 
     <!-- Kodion Common -->
     <string id="30100">Favoriten</string>

@@ -27,4 +27,11 @@ class TestProvider(unittest.TestCase):
         list = result[0]
         pass
 
+    def test_root(self):
+        context = kodion.Context(path='/')
+        provider = Provider()
+        result = provider.navigate(context)
+        list = result[0]
+        pass
+
     pass

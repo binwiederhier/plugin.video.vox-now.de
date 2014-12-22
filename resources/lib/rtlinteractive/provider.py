@@ -135,13 +135,14 @@ class Provider(kodion.AbstractProvider):
 
     @kodion.RegisterProviderPath('^/format/(?P<format_id>\d+)/$')
     def _on_format(self, context, re_match):
+        context.get_ui().set_view_mode('videos')
+
         result = []
         format_id = re_match.group('format_id')
         page = int(context.get_param('page', 1))
         json_data = context.get_function_cache().get(FunctionCache.ONE_HOUR / 2, self.get_client(context).get_films,
                                                      format_id=format_id, page=page)
         result.extend(self._list_films(context, re_match, json_data))
-
         return result
 
     @kodion.RegisterProviderPath('^/newest/$')
@@ -205,6 +206,7 @@ class Provider(kodion.AbstractProvider):
         return result
 
     def on_search(self, search_text, context, re_match):
+        context.get_ui().set_view_mode('videos')
         result = []
 
         json_data = self.get_client(context).search(search_text)
