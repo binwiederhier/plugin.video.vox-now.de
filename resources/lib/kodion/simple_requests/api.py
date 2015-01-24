@@ -50,6 +50,9 @@ def _request(method, url,
 
     query = ''
     if params:
+        for key in params:
+            params[key] = str(unicode(params[key]).encode('utf-8'))
+            pass
         query = urllib.urlencode(params)
         pass
     if query:
@@ -58,7 +61,7 @@ def _request(method, url,
     request = urllib2.Request(url)
     if headers:
         for key in headers:
-            request.add_header(key, headers[key].encode('utf-8'))
+            request.add_header(key, str(unicode(headers[key]).encode('utf-8')))
             pass
         pass
     if data:
