@@ -1,5 +1,6 @@
-2.0.8 (2015-01-24)
+2.0.9 (2015-01-24)
 UPD: dropped support for Frodo
+UPD: settings
 UPD: Kodion with UriItem
 UPD: test simple_requests implementation
 
