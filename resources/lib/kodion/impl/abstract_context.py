@@ -21,6 +21,7 @@ class AbstractContext(object):
         self._access_manager = None
 
         self._plugin_name = unicode(plugin_name)
+        self._version = 'UNKNOWN'
         self._plugin_id = plugin_id
         self._path = create_path(path)
         self._params = params
@@ -74,6 +75,18 @@ class AbstractContext(object):
             self._access_manager = AccessManager(self.get_settings())
             pass
         return self._access_manager
+
+    def get_video_playlist(self):
+        raise NotImplementedError()
+
+    def get_audio_playlist(self):
+        raise NotImplementedError()
+
+    def get_video_player(self):
+        raise NotImplementedError()
+
+    def get_audio_player(self):
+        raise NotImplementedError()
 
     def get_ui(self):
         raise NotImplementedError()
@@ -145,6 +158,9 @@ class AbstractContext(object):
 
     def get_name(self):
         return self._plugin_name
+
+    def get_version(self):
+        return self._version
 
     def get_id(self):
         return self._plugin_id

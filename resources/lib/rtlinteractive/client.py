@@ -5,19 +5,7 @@ import uuid
 import time
 from xml.etree import ElementTree
 
-import requests
-
-# Verify is disabled and to avoid warnings we disable the warnings. Behind a proxy request isn't working correctly all
-# the time and if so can't validate the hosts correctly resulting in a exception and the addon won't work properly.
-
-try:
-    from requests.packages import urllib3
-
-    urllib3.disable_warnings()
-except:
-    # do nothing
-    pass
-
+from resources.lib.kodion import simple_requests as requests
 
 class Client(object):
     CONFIG_RTL_NOW = {'salt_phone': 'ba647945-6989-477b-9767-870790fcf552',
@@ -121,7 +109,7 @@ class Client(object):
 
         def _get_xml(_xml_url):
             _xml = _browse(_xml_url)
-            return ElementTree.fromstring(_xml.encode('utf-8'))
+            return ElementTree.fromstring(_xml)
 
         def _get_data_from_html(_video_url):
             html = _browse(_video_url)

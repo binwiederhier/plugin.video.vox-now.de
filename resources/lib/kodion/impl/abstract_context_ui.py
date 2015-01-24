@@ -2,6 +2,12 @@ __author__ = 'bromix'
 
 
 class AbstractContextUI(object):
+    def __init__(self):
+        pass
+
+    def create_progress_dialog(self, heading, text=None, background=False):
+        raise NotImplementedError()
+
     def set_view_mode(self, view_mode):
         raise NotImplementedError()
 
@@ -18,6 +24,9 @@ class AbstractContextUI(object):
         raise NotImplementedError()
 
     def on_yes_no_input(self, title, text):
+        raise NotImplementedError()
+
+    def on_remove_content(self, content_name):
         raise NotImplementedError()
 
     def on_select(self, title, items=[]):

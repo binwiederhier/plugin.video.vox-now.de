@@ -5,10 +5,11 @@ import xbmcgui
 import xbmcplugin
 
 from ..abstract_provider_runner import AbstractProviderRunner
-from ...exceptions import KodimonException
+from ...exceptions import KodionException
 from ...items import *
 from ... import constants, AbstractProvider
 from . import info_labels
+from . import xbmc_items
 
 
 class XbmcRunner(AbstractProviderRunner):
@@ -20,7 +21,7 @@ class XbmcRunner(AbstractProviderRunner):
         results = None
         try:
             results = provider.navigate(context)
-        except KodimonException, ex:
+        except KodionException, ex:
             if provider.handle_exception(context, ex):
                 context.log_error(ex.__str__())
                 xbmcgui.Dialog().ok("Exception in ContentProvider", ex.__str__())
@@ -33,7 +34,7 @@ class XbmcRunner(AbstractProviderRunner):
 
         if isinstance(result, bool) and not result:
             xbmcplugin.endOfDirectory(context.get_handle(), succeeded=False)
-        elif isinstance(result, VideoItem) or isinstance(result, AudioItem):
+        elif isinstance(result, VideoItem) or isinstance(result, AudioItem) or isinstance(result, UriItem):
             self._set_resolved_url(context, result)
         elif isinstance(result, DirectoryItem):
             self._add_directory(context, result)
@@ -68,8 +69,9 @@ class XbmcRunner(AbstractProviderRunner):
         pass
 
     def _set_resolved_url(self, context, base_item, succeeded=True):
-        list_item = xbmcgui.ListItem(path=base_item.get_uri())
-        xbmcplugin.setResolvedUrl(context.get_handle(), succeeded=succeeded, listitem=list_item)
+        item = xbmc_items.to_item(context, base_item)
+        item.setPath(base_item.get_uri())
+        xbmcplugin.setResolvedUrl(context.get_handle(), succeeded=succeeded, listitem=item)
 
         """
         # just to be sure :)
@@ -94,7 +96,8 @@ class XbmcRunner(AbstractProviderRunner):
             item.setProperty(u'fanart_image', directory_item.get_fanart())
             pass
         if directory_item.get_context_menu() is not None:
-            item.addContextMenuItems(directory_item.get_context_menu())
+            item.addContextMenuItems(directory_item.get_context_menu(),
+                                     replaceItems=directory_item.replace_context_menu())
             pass
 
         xbmcplugin.addDirectoryItem(handle=context.get_handle(),
@@ -105,22 +108,7 @@ class XbmcRunner(AbstractProviderRunner):
         pass
 
     def _add_video(self, context, video_item, item_count=0):
-        item = xbmcgui.ListItem(label=video_item.get_name(),
-                                iconImage=u'DefaultVideo.png',
-                                thumbnailImage=video_item.get_image())
-
-        # only set fanart is enabled
-        settings = context.get_settings()
-        if video_item.get_fanart() and settings.show_fanart():
-            item.setProperty(u'fanart_image', video_item.get_fanart())
-            pass
-        if video_item.get_context_menu() is not None:
-            item.addContextMenuItems(video_item.get_context_menu())
-            pass
-
-        item.setProperty(u'IsPlayable', u'true')
-
-        item.setInfo(type=u'video', infoLabels=info_labels.create_from_item(video_item))
+        item = xbmc_items.to_video_item(context, video_item)
 
         xbmcplugin.addDirectoryItem(handle=context.get_handle(),
                                     url=video_item.get_uri(),
@@ -139,7 +127,7 @@ class XbmcRunner(AbstractProviderRunner):
             item.setProperty(u'fanart_image', image_item.get_fanart())
             pass
         if image_item.get_context_menu() is not None:
-            item.addContextMenuItems(image_item.get_context_menu())
+            item.addContextMenuItems(image_item.get_context_menu(), replaceItems=image_item.replace_context_menu())
             pass
 
         item.setInfo(type=u'picture', infoLabels=info_labels.create_from_item(image_item))
@@ -151,22 +139,7 @@ class XbmcRunner(AbstractProviderRunner):
         pass
 
     def _add_audio(self, context, audio_item, item_count):
-        item = xbmcgui.ListItem(label=audio_item.get_name(),
-                                iconImage=u'DefaultAudio.png',
-                                thumbnailImage=audio_item.get_image())
-
-        # only set fanart is enabled
-        settings = context.get_settings()
-        if audio_item.get_fanart() and settings.show_fanart():
-            item.setProperty(u'fanart_image', audio_item.get_fanart())
-            pass
-        if audio_item.get_context_menu() is not None:
-            item.addContextMenuItems(audio_item.get_context_menu())
-            pass
-
-        item.setProperty(u'IsPlayable', u'true')
-
-        item.setInfo(type=u'music', infoLabels=info_labels.create_from_item(audio_item))
+        item = xbmc_items.to_audio_item(context, audio_item)
 
         xbmcplugin.addDirectoryItem(handle=context.get_handle(),
                                     url=audio_item.get_uri(),

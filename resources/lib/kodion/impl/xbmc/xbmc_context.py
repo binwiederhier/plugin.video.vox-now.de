@@ -11,7 +11,8 @@ from ..abstract_context import AbstractContext
 from .xbmc_plugin_settings import XbmcPluginSettings
 from .xbmc_context_ui import XbmcContextUI
 from .xbmc_system_version import XbmcSystemVersion
-
+from .xbmc_playlist import XbmcPlaylist
+from .xbmc_player import XbmcPlayer
 
 class XbmcContext(AbstractContext):
     def __init__(self, path='/', params=None, plugin_name=u'', plugin_id=u'', override=True):
@@ -51,9 +52,14 @@ class XbmcContext(AbstractContext):
             pass
 
         self._ui = None
+        self._video_playlist = None
+        self._audio_playlist = None
+        self._video_player = None
+        self._audio_player = None
         self._plugin_handle = int(sys.argv[1])
         self._plugin_id = plugin_id or self._addon.getAddonInfo('id')
         self._plugin_name = plugin_name or self._addon.getAddonInfo('name')
+        self._version = self._addon.getAddonInfo('version')
         self._native_path = xbmc.translatePath(self._addon.getAddonInfo('path'))
         self._settings = XbmcPluginSettings(self._addon)
 
@@ -81,6 +87,30 @@ class XbmcContext(AbstractContext):
 
     def get_system_version(self):
         return self._system_version
+
+    def get_video_playlist(self):
+        if not self._video_playlist:
+            self._video_playlist = XbmcPlaylist('video', weakref.proxy(self))
+            pass
+        return self._video_playlist
+
+    def get_audio_playlist(self):
+        if not self._audio_playlist:
+            self._audio_playlist = XbmcPlaylist('audio', weakref.proxy(self))
+            pass
+        return self._audio_playlist
+
+    def get_video_player(self):
+        if not self._video_player:
+            self._video_player = XbmcPlayer('video', weakref.proxy(self))
+            pass
+        return self._video_player
+
+    def get_audio_player(self):
+        if not self._audio_player:
+            self._audio_player = XbmcPlayer('audio', weakref.proxy(self))
+            pass
+        return self._audio_player
 
     def get_ui(self):
         if not self._ui:
@@ -122,6 +152,7 @@ class XbmcContext(AbstractContext):
 
     def set_content_type(self, content_type):
         xbmcplugin.setContent(self._plugin_handle, content_type)
+        self.get_ui().set_view_mode(content_type)
         pass
 
     def add_sort_method(self, *sort_methods):
@@ -146,6 +177,9 @@ class XbmcContext(AbstractContext):
         new_context._favorite_list = self._favorite_list
         new_context._watch_later_list = self._watch_later_list
         new_context._access_manager = self._access_manager
+        new_context._ui = self._ui
+        new_context._video_playlist = self._video_playlist
+        new_context._video_player = self._video_player
 
         return new_context
 

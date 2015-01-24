@@ -4,7 +4,7 @@ from resources.lib.kodion.utils import FunctionCache
 __author__ = 'bromix'
 
 from resources.lib import kodion
-from resources.lib.kodion.items import DirectoryItem, VideoItem
+from resources.lib.kodion.items import DirectoryItem, VideoItem, UriItem
 from resources.lib.kodion import iso8601
 from .client import Client
 
@@ -22,6 +22,9 @@ class Provider(kodion.AbstractProvider):
         self._client = None
         pass
 
+    def get_wizard_supported_views(self):
+        return ['default', 'episodes']
+
     def get_client(self, context):
         if not self._client:
             amount = context.get_settings().get_items_per_page()
@@ -31,6 +34,8 @@ class Provider(kodion.AbstractProvider):
         return self._client
 
     def _list_films(self, context, re_match, json_data, show_format_title=False, sort=True):
+        context.get_ui().set_view_mode('videos')
+
         def _sort_newest(item):
             return item.get_aired()
 
@@ -127,16 +132,13 @@ class Provider(kodion.AbstractProvider):
         if video_id:
             server_id = context.get_function_cache().get(FunctionCache.ONE_HOUR * 6, Client.get_server_id)
             streams = self.get_client(context).get_film_streams(video_id, server_id=server_id)
-            video_item = VideoItem(video_id,
-                                   streams[0])
-            return video_item
+            uri_item = UriItem(streams[0])
+            return uri_item
 
         return False
 
     @kodion.RegisterProviderPath('^/format/(?P<format_id>\d+)/$')
     def _on_format(self, context, re_match):
-        context.get_ui().set_view_mode('videos')
-
         result = []
         format_id = re_match.group('format_id')
         page = int(context.get_param('page', 1))

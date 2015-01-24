@@ -4,7 +4,10 @@ import xbmc
 import xbmcgui
 
 from ..abstract_context_ui import AbstractContextUI
+from .xbmc_progress_dialog import XbmcProgressDialog
+from .xbmc_progress_dialog_bg import XbmcProgressDialogBG
 from ... import constants
+
 
 class XbmcContextUI(AbstractContextUI):
     def __init__(self, xbmc_addon, context):
@@ -16,9 +19,15 @@ class XbmcContextUI(AbstractContextUI):
         self._view_mode = None
         pass
 
+    def create_progress_dialog(self, heading, text=None, background=False):
+        if background:
+            return XbmcProgressDialogBG(heading, text)
+
+        return XbmcProgressDialog(heading, text)
+
     def set_view_mode(self, view_mode):
         if isinstance(view_mode, basestring):
-            view_mode = self._context.get_settings().get_int(constants.setting.VIEW_X % view_mode, 51)
+            view_mode = self._context.get_settings().get_int(constants.setting.VIEW_X % view_mode, 50)
             pass
 
         self._view_mode = view_mode
@@ -28,7 +37,7 @@ class XbmcContextUI(AbstractContextUI):
         if self._view_mode is not None:
             return self._view_mode
 
-        return self._context.get_settings().get_int(constants.setting.VIEW_DEFAULT, 51)
+        return self._context.get_settings().get_int(constants.setting.VIEW_DEFAULT, 50)
 
     def get_skin_id(self):
         return xbmc.getSkinDir()
@@ -60,6 +69,14 @@ class XbmcContextUI(AbstractContextUI):
     def on_yes_no_input(self, title, text):
         dialog = xbmcgui.Dialog()
         return dialog.yesno(title, text)
+
+    def on_remove_content(self, content_name):
+        text = self._context.localize(constants.localize.REMOVE_CONTENT) % content_name
+        return self.on_yes_no_input(self._context.localize(constants.localize.CONFIRM_REMOVE), text)
+
+    def on_delete_content(self, content_name):
+        text = self._context.localize(constants.localize.DELETE_CONTENT) % content_name
+        return self.on_yes_no_input(self._context.localize(constants.localize.CONFIRM_DELETE), text)
 
     def on_select(self, title, items=[]):
         _dict = {}
