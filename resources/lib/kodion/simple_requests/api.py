@@ -8,6 +8,27 @@ from StringIO import StringIO
 import gzip
 
 
+class ErrorHandler(urllib2.HTTPDefaultErrorHandler):
+    def http_error_default(self, req, fp, code, msg, hdrs):
+        infourl = urllib.addinfourl(fp, hdrs, req.get_full_url())
+        infourl.status = code
+        infourl.code = code
+        return infourl
+
+
+class NoRedirectHandler(urllib2.HTTPRedirectHandler):
+    def http_error_302(self, req, fp, code, msg, headers):
+        infourl = urllib.addinfourl(fp, headers, req.get_full_url())
+        infourl.status = code
+        infourl.code = code
+        return infourl
+
+    http_error_300 = http_error_302
+    http_error_301 = http_error_302
+    http_error_303 = http_error_302
+    http_error_307 = http_error_302
+
+
 class Response():
     def __init__(self):
         self.headers = {}
@@ -40,13 +61,29 @@ def _request(method, url,
              verify=None,
              cert=None,
              json=None):
-
     if not headers:
         headers = {}
         pass
 
-    proxy_handler = urllib2.ProxyHandler()
-    opener = urllib2.build_opener(proxy_handler)
+    handlers = []
+
+    import sys
+    # starting with python 2.7.9 urllib verifies every https request
+    if False == verify and sys.version_info >= (2, 7, 9):
+        import ssl
+
+        ssl_context = ssl.create_default_context()
+        ssl_context.check_hostname = False
+        ssl_context.verify_mode = ssl.CERT_NONE
+        handlers.append(urllib2.HTTPSHandler(context=ssl_context))
+        pass
+
+    # handlers.append(urllib2.HTTPCookieProcessor())
+    # handlers.append(ErrorHandler)
+    if not allow_redirects:
+        handlers.append(NoRedirectHandler)
+        pass
+    opener = urllib2.build_opener(*handlers)
 
     query = ''
     if params:
@@ -64,18 +101,32 @@ def _request(method, url,
             request.add_header(key, str(unicode(headers[key]).encode('utf-8')))
             pass
         pass
-    if data:
-        if headers.get('Content-Type', '').startswith('application/x-www-form-urlencoded'):
-            for key in data:
-                data[key] = data[key].encode('utf-8')
+    if data or json:
+        if headers.get('Content-Type', '').startswith('application/x-www-form-urlencoded') or data:
+            # transform a string into a map of values
+            if isinstance(data, basestring):
+                _data = data.split('&')
+                data = {}
+                for item in _data:
+                    name, value = item.split('=')
+                    data[name] = value
+                    pass
                 pass
+
+            # encode each value
+            for key in data:
+                data[key] = unicode(data[key]).encode('utf-8')
+                pass
+
+            # urlencode
             request.data = urllib.urlencode(data)
             pass
-        elif headers.get('Content-Type', '').startswith('application/json'):
+        elif headers.get('Content-Type', '').startswith('application/json') and data:
             request.data = real_json.dumps(data).encode('utf-8')
             pass
         elif json:
             request.data = real_json.dumps(json).encode('utf-8')
+            pass
         else:
             if not isinstance(data, basestring):
                 data = str(data)
@@ -87,19 +138,24 @@ def _request(method, url,
             request.data = data
             pass
         pass
+    elif method.upper() in ['POST', 'PUT']:
+        request.data = "null"
+        pass
     request.get_method = lambda: method
     result = Response()
     response = None
     try:
-         response = opener.open(request)
-         result.headers.update(response.headers)
-         result.status_code = response.getcode()
+        response = opener.open(request)
     except urllib2.HTTPError, e:
-        from .. import logging
-
-        logging.log_error(e.__str__())
+        # HTTPError implements addinfourl, so we can use the exception to construct a response
+        if isinstance(e, urllib2.addinfourl):
+            response = e
+            pass
         pass
 
+    # process response
+    result.headers.update(response.headers)
+    result.status_code = response.getcode()
     if response.headers.get('Content-Encoding', '').startswith('gzip'):
         buf = StringIO(response.read())
         f = gzip.GzipFile(fileobj=buf)
