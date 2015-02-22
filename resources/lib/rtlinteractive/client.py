@@ -1,11 +1,20 @@
 import hashlib
-import json
 import re
 import uuid
 import time
 from xml.etree import ElementTree
 
+from resources.lib.kodion.exceptions import KodionException
+
 from resources.lib.kodion import simple_requests as requests
+
+
+class UnsupportedStreamException(KodionException):
+    def __init__(self):
+        KodionException.__init__(self, 'DRM Protected stream not supported')
+        pass
+    pass
+
 
 class Client(object):
     CONFIG_RTL_NOW = {'salt_phone': 'ba647945-6989-477b-9767-870790fcf552',
@@ -150,6 +159,12 @@ class Client(object):
             xml = _get_xml(player_data_url)
             video_info = xml.find('./playlist/videoinfo')
             for filename in video_info.findall('filename'):
+                # FlashAccess DRM protection isn't supported yet
+                metadaten = filename.get('metadaten')
+                headerdaten = filename.get('headerdaten')
+                if metadaten and headerdaten:
+                    raise UnsupportedStreamException
+
                 rtmpe_match = re.search(r'(?P<url>rtmpe://(?:[^/]+/){2})(?P<play_path>.+)', filename.text)
                 hds_match = re.search(r'http://hds.+/(?P<play_path>\d+/.+)', filename.text)
                 if rtmpe_match:
@@ -161,7 +176,8 @@ class Client(object):
                 elif hds_match:
                     play_path = hds_match.group('play_path').replace('.f4m', '')
                     rtmpe = self._config['rtmpe'] % server_id
-                    url = '%s%s playpath=%s swfVfy=1 swfUrl=%s pageUrl=%s' % (rtmpe, play_path, 'mp4:'+play_path, player_url, video_url)
+                    url = '%s%s playpath=%s swfVfy=1 swfUrl=%s pageUrl=%s' % (
+                        rtmpe, play_path, 'mp4:' + play_path, player_url, video_url)
                     result.append(url)
                     pass
                 else:
@@ -286,8 +302,6 @@ class Client(object):
         if result is None:
             return {}
 
-        # tests showed that json.loads was 2 times faster then result.json of requests
-        return json.loads(result.text)
-        #return result.json()
+        return result.json()
 
     pass

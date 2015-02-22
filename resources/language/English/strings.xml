@@ -53,10 +53,12 @@
     <string id="30117">Remove "%s"?</string>
     <string id="30118">Delete</string>
     <string id="30119">Please wait...</string>
+    <string id="30120">Clear</string>
 
     <!-- NOW -->
     <string id="30500">Shows (A-Z)</string>
     <string id="30501">Newest</string>
     <string id="30502">Tips</string>
     <string id="30503">Top 10</string>
+    <string id="30504">DRM protected streams are not supported</string>
 </strings>

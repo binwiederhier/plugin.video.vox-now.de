@@ -6,24 +6,25 @@ __author__ = 'bromix'
 from resources.lib import kodion
 from resources.lib.kodion.items import DirectoryItem, VideoItem, UriItem
 from resources.lib.kodion import iso8601
-from .client import Client
+from .client import Client, UnsupportedStreamException
 
 
 class Provider(kodion.AbstractProvider):
-    LOCAL_MAP = {'now.library': 30500,
-                 'now.newest': 30501,
-                 'now.tips': 30502,
-                 'now.top10': 30503,
-                 'now.add_to_favs': 30101,
-                 'now.watch_later': 30107}
-
     def __init__(self):
         kodion.AbstractProvider.__init__(self)
         self._client = None
+
+        self._local_map.update({'now.library': 30500,
+                                'now.newest': 30501,
+                                'now.tips': 30502,
+                                'now.top10': 30503,
+                                'now.add_to_favs': 30101,
+                                'now.watch_later': 30107,
+                                'now.exception.drm_not_supported': 30504})
         pass
 
     def get_wizard_supported_views(self):
-        return ['default', 'episodes']
+        return ['default', 'episodes', 'tvshows']
 
     def get_client(self, context):
         if not self._client:
@@ -105,7 +106,7 @@ class Provider(kodion.AbstractProvider):
             # plot
             film_item.set_plot(film['articlelong'])
 
-            context_menu = [(context.localize(self.LOCAL_MAP['now.watch_later']),
+            context_menu = [(context.localize(self._local_map['now.watch_later']),
                              'RunPlugin(%s)' % context.create_uri([kodion.constants.paths.WATCH_LATER, 'add'],
                                                                   {'item': kodion.items.to_jsons(film_item)}))]
             film_item.set_context_menu(context_menu)
@@ -131,7 +132,12 @@ class Provider(kodion.AbstractProvider):
         video_id = context.get_param('video_id', '')
         if video_id:
             server_id = context.get_function_cache().get(FunctionCache.ONE_HOUR * 6, Client.get_server_id)
-            streams = self.get_client(context).get_film_streams(video_id, server_id=server_id)
+            try:
+                streams = self.get_client(context).get_film_streams(video_id, server_id=server_id)
+            except UnsupportedStreamException, ex:
+                context.get_ui().show_notification(context.localize(self._local_map['now.exception.drm_not_supported']))
+                return False
+
             uri_item = UriItem(streams[0])
             return uri_item
 
@@ -197,7 +203,7 @@ class Provider(kodion.AbstractProvider):
                 fanart = re.sub(r'(.+/)(\d+)x(\d+)(/.+)', r'\g<1>768x432\g<4>', fanart)
                 format_item.set_fanart(fanart)
 
-                context_menu = [(context.localize(self.LOCAL_MAP['now.add_to_favs']),
+                context_menu = [(context.localize(self._local_map['now.add_to_favs']),
                                  'RunPlugin(%s)' % context.create_uri([kodion.constants.paths.FAVORITES, 'add'],
                                                                       {'item': kodion.items.to_jsons(format_item)}))]
                 format_item.set_context_menu(context_menu)
@@ -241,28 +247,28 @@ class Provider(kodion.AbstractProvider):
             pass
 
         # shows (A-Z)
-        library_item = DirectoryItem(context.localize(self.LOCAL_MAP['now.library']),
+        library_item = DirectoryItem(context.localize(self._local_map['now.library']),
                                      context.create_uri(['library']),
                                      image=context.create_resource_path('media', 'library.png'))
         library_item.set_fanart(self.get_fanart(context))
         result.append(library_item)
 
         # newest
-        newest_item = DirectoryItem(context.localize(self.LOCAL_MAP['now.newest']),
+        newest_item = DirectoryItem(context.localize(self._local_map['now.newest']),
                                     context.create_uri(['newest']),
                                     image=context.create_resource_path('media', 'newest.png'))
         newest_item.set_fanart(self.get_fanart(context))
         result.append(newest_item)
 
         # tips
-        tips_item = DirectoryItem(context.localize(self.LOCAL_MAP['now.tips']),
+        tips_item = DirectoryItem(context.localize(self._local_map['now.tips']),
                                   context.create_uri(['tips']),
                                   image=context.create_resource_path('media', 'tips.png'))
         tips_item.set_fanart(self.get_fanart(context))
         result.append(tips_item)
 
         # top 10
-        top10_item = DirectoryItem(context.localize(self.LOCAL_MAP['now.top10']),
+        top10_item = DirectoryItem(context.localize(self._local_map['now.top10']),
                                    context.create_uri(['top10']),
                                    image=context.create_resource_path('media', 'top10.png'))
         top10_item.set_fanart(self.get_fanart(context))
