@@ -185,9 +185,11 @@ class Provider(kodion.AbstractProvider):
             now_format = format_list[key]
             title = now_format['formatlong']
             format_id = now_format['formatid']
-            free_episodes = int(now_format.get('free_episodes', '0'))
+            catchuptext = now_format['catchuptext']
+            free_episodes = int(now_format.get('free_episodes', '0'))            
+            might_have_free_episodes = free_episodes >= 1 or catchuptext.find('FREE') != -1
 
-            if free_episodes >= 1:
+            if might_have_free_episodes:
                 format_item = DirectoryItem(title,
                                             context.create_uri(['format', format_id]))
 
